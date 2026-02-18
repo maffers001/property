@@ -1,0 +1,10 @@
+# Exclude data folder (bank downloads, generated/checked files)
+/data/
+
+# Optional: common Python/notebook artifacts
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
