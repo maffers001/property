@@ -1,0 +1,14 @@
+---
+description: Transaction categories, property codes, and spreadsheet checks
+globs: python/PropertyAnalytics_v2/**/*.ipynb
+alwaysApply: false
+---
+
+# Categorisation and Checking Rules
+
+- **Property code + Cat:** Transactions with a Property code are normally Mortgage, PropertyExpense, or OurRent. PersonalExpense with a property code is usually an error – correct to the right Cat and keep Property, or remove Property if truly personal.
+- **Must have Property:** Mortgage, OurRent, BealsRent, PropertyExpense. Premier Accountancy → property code **RSA**. If unsure of code, use Memo and prior months (e.g. "464 161618" → F161618ALH); if still stuck, flag for user and learn for next month.
+- **Freehold blocks (separate accounts):** 4-6/8/12-14/16-18 Alhambra (Alhambra Road Mgmt); 23 Hampshire Terrace (Lordswood Estates); 169/171 Fawcett, 321 London (V.T. Estates); 163 Fratton (Fratton Road Ltd). Block expenses on Starling must be corrected – they belong in freehold accounts.
+- **Manual-check highlights:** **Yellow** = best-guess Cat/Subcat or property code, or new-tenancy split (rent row + agent fee row). **Red** = unusual: large personal expense, missing rent, unpaid mortgage.
+- **New tenancy:** Split single net rent into two rows (rent + letting agent fee), both yellow; rent row Memo e.g. "Rent for period DD/MM/YY-DD/MM/YY Mr Firstname Lastname"; agent row = agent name; amounts sum to original.
+- **Special cases:** SSE SOUTHERN → PropertyExpense; PNET → RegularPayment; Lordswood Estates (OurRent) → ServiceCharge. Letting agents: Fox & Sons, Bernards, Beals.

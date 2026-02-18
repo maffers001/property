@@ -1,0 +1,13 @@
+---
+description: Property analytics pipeline – paths, pipeline order, and deliverables
+alwaysApply: true
+---
+
+# Property Analytics Pipeline
+
+- **Paths (repo root):** Bank inputs `data/property/bank-download/`; pipeline outputs `data/property/generated/`; **final checked** files `data/property/checked/` (must be checked .xlsx for monthly statement). Notebooks in `python/PropertyAnalytics_v2/`.
+- **Pipeline order:** 1.0 CreateStandardFiles → 1.5 PopulatePropertyIds → 2.0 CategoriseFiles → manual check → 3.0 MonthlySummary MMMYY. Each step uses start/end dates at top of notebook.
+- **Bank files per month:** `BC_4040_MMMYYYY.csv`, `BC_3072_MMMYYYY.csv`, `BC_6045_MMMYYYY.csv`, `StarlingStatement_YYYY-MM.csv`. Starling = business (0055); 3072 = mortgages; 6045/4040 = personal/household.
+- **Generated files:** `MMMYYYY.csv` → `MMMYYYY_coded.csv` → `MMMYYYY_codedAndCategorised.csv`. The **deliverable** is the checked file in `checked/` (saved as .xlsx) used by the monthly summary notebook.
+- **Tenancies:** `data/property/bank-download/all_tenancies.xls` – update on new tenancy (add row, set previous tenant end date).
+- **Full context:** See `PROJECT_CONTEXT.md` for categories, property codes, freehold blocks, and automation goals.
