@@ -3,6 +3,7 @@
 import hashlib
 import json
 import uuid
+import warnings
 from datetime import datetime
 from pathlib import Path
 
@@ -47,13 +48,35 @@ def load_barclays(filepath: str | Path, import_batch_id: str) -> tuple[list[dict
     filepath = Path(filepath)
     source_file = filepath.name
 
-    df = pd.read_csv(
-        filepath,
-        names=["Number", "Date", "Account", "Amount", "Subcategory", "Memo"],
-        skiprows=1,
-        dtype=str,
-    )
-    df["Memo2"] = ""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", pd.errors.ParserWarning)
+        try:
+            df = pd.read_csv(
+                filepath,
+                names=["Number", "Date", "Account", "Amount", "Subcategory", "Memo"],
+                skiprows=1,
+                dtype=str,
+                on_bad_lines="warn",
+            )
+        except (TypeError, Exception):
+            df = None
+    if df is None:
+        # Variable columns (e.g. extra comma in Memo) - use python engine, take first 6
+        try:
+            df = pd.read_csv(filepath, skiprows=1, dtype=str, engine="python", on_bad_lines="warn")
+        except TypeError:
+            df = pd.read_csv(filepath, skiprows=1, dtype=str, engine="python")
+        ncol = min(6, df.shape[1])
+        df = df.iloc[:, :ncol].copy()
+        df.columns = ["Number", "Date", "Account", "Amount", "Subcategory", "Memo"][:ncol]
+        for c in ["Number", "Date", "Account", "Amount", "Subcategory", "Memo"]:
+            if c not in df.columns:
+                df[c] = ""
+    if "Memo2" not in df.columns:
+        df["Memo2"] = ""
+    for c in ["Number", "Date", "Account", "Amount", "Subcategory", "Memo"]:
+        if c in df.columns:
+            df[c] = df[c].astype(str).fillna("")
     df = df.fillna("")
     df = df.replace("\t", "", regex=True)
 
@@ -61,39 +84,43 @@ def load_barclays(filepath: str | Path, import_batch_id: str) -> tuple[list[dict
     canonical_rows = []
 
     for idx, row in df.iterrows():
-        row_number = idx + 1
+        try:
+            row_number = int(idx) + 1
+        except (TypeError, ValueError):
+            row_number = 1
         raw_row_id = f"{import_batch_id}_{source_file}_{row_number}"
 
-        raw_dict = {k: row[k] for k in df.columns}
+        raw_dict = {k: str(row[k]) if pd.notna(row[k]) else "" for k in df.columns}
         raw_rows.append({
             "raw_row_id": raw_row_id,
-            "import_batch_id": import_batch_id,
+            "import_batch_id": str(import_batch_id),
             "source_bank": "barclays",
-            "source_file": source_file,
+            "source_file": str(source_file),
             "row_number": row_number,
             "raw_json": json.dumps(raw_dict),
         })
 
-        memo_combined = row["Memo"]
-        if row["Memo2"]:
-            memo_combined = memo_combined + row["Memo2"]
+        memo_combined = str(row["Memo"]) if pd.notna(row["Memo"]) else ""
+        memo2 = str(row["Memo2"]) if pd.notna(row["Memo2"]) and str(row["Memo2"]).strip() else ""
+        if memo2:
+            memo_combined = memo_combined + memo2
         memo_combined = memo_combined.strip()
 
-        amount_str = row["Amount"].strip()
+        amount_str = str(row["Amount"]).strip() if pd.notna(row["Amount"]) else "0"
         try:
             amount = float(amount_str)
         except ValueError:
             amount = 0.0
 
-        date_str = row["Date"].strip()
+        date_str = str(row["Date"]).strip() if pd.notna(row["Date"]) else ""
         try:
             posted_date = pd.to_datetime(date_str, dayfirst=True).strftime("%Y-%m-%d")
         except Exception:
             posted_date = date_str
 
-        source_account = row["Account"].strip()
-        bank_txn_number = row["Number"].strip()
-        bank_subcategory = row["Subcategory"].strip()
+        source_account = str(row["Account"]).strip() if pd.notna(row["Account"]) else ""
+        bank_txn_number = str(row["Number"]).strip() if pd.notna(row["Number"]) else ""
+        bank_subcategory = str(row["Subcategory"]).strip() if pd.notna(row["Subcategory"]) else ""
 
         tx_id = _compute_tx_id(
             "barclays", source_account, posted_date, amount,
@@ -144,15 +171,20 @@ def load_starling(filepath: str | Path, import_batch_id: str) -> tuple[list[dict
         df = pd.read_csv(filepath, dtype=str, encoding="latin-1", errors="replace")
 
     df = df.fillna("")
+    for c in df.columns:
+        df[c] = df[c].astype(str)
 
     raw_rows = []
     canonical_rows = []
 
     for idx, row in df.iterrows():
-        row_number = idx + 1
+        try:
+            row_number = int(idx) + 1
+        except (TypeError, ValueError):
+            row_number = 1
         raw_row_id = f"{import_batch_id}_{source_file}_{row_number}"
 
-        raw_dict = {k: row[k] for k in df.columns}
+        raw_dict = {k: str(row[k]) if pd.notna(row[k]) else "" for k in df.columns}
         raw_rows.append({
             "raw_row_id": raw_row_id,
             "import_batch_id": import_batch_id,

@@ -36,6 +36,21 @@ pip install -r requirements.txt
   python -m property_pipeline backtest --months OCT2025 SEP2025
   ```
 
+## Why backtest doesn't use the database
+
+**Backtest** uses a separate, self-contained path so you can measure accuracy without touching the DB or running the full pipeline:
+
+1. It reads the same **bank CSVs** from `bank-download/`.
+2. It loads **rules and properties** from code (`rules_seed.py`), not from the DB.
+3. It runs the **rule engine in memory** on the loaded transactions and gets labels.
+4. It loads **ground truth** from the XLSX (or CSV) in `checked/` and compares row-by-row.
+
+So backtest never opens `labels.db`. It only needs bank files + checked XLSX. The **full pipeline** (`run_month`) does use the DB: it stores raw rows, canonical transactions, and labels there so you can review, correct, and finalize later. Backtest is for measuring how well the rules behave; the DB is for the live workflow.
+
+## Backups
+
+Before overwriting any output file, the pipeline creates a timestamped backup (e.g. `OCT2025_codedAndCategorised.xlsx.bak_20250218-143022`). This applies to files written in `generated/`, `review/`, and when running `finalize_month` to `checked/`.
+
 ## Docker
 
 ```bash

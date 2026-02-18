@@ -2,6 +2,8 @@
 
 import json
 import sqlite3
+import shutil
+import time
 from pathlib import Path
 
 from .config import (
@@ -15,6 +17,15 @@ from .export import (
     write_review_queue, write_diagnostic_ddcheck, write_diagnostic_catcheck,
 )
 from .rules_seed import get_all_rules, PROPERTIES_SEED
+
+
+def _backup_if_exists(filepath: Path) -> None:
+    """If file exists, copy it to a timestamped backup (e.g. file.xlsx.bak_20250218-143022)."""
+    if not filepath.exists():
+        return
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    backup_path = Path(str(filepath) + f".bak_{timestr}")
+    shutil.copy2(filepath, backup_path)
 
 
 def seed_db(db_path: Path | str | None = None) -> None:
@@ -185,13 +196,15 @@ def run_month(
         n_labels = _store_labels(conn, labels)
         print(f"Stored {n_labels} labels")
 
-    # 6. Export
+    # 6. Export (backup existing files before overwriting)
     gen_dir.mkdir(parents=True, exist_ok=True)
 
     output_df = build_output_dataframe(canonical_rows, labels)
 
     draft_xlsx = gen_dir / f"{month_str}_codedAndCategorised.xlsx"
     draft_csv = gen_dir / f"{month_str}_codedAndCategorised.csv"
+    _backup_if_exists(draft_xlsx)
+    _backup_if_exists(draft_csv)
     write_xlsx(output_df, draft_xlsx)
     write_csv(output_df, draft_csv)
     print(f"Draft written: {draft_xlsx}")
@@ -200,12 +213,15 @@ def run_month(
     review_dir = REVIEW_DIR
     review_dir.mkdir(parents=True, exist_ok=True)
     review_path = review_dir / f"review_queue_{month_str}.xlsx"
+    _backup_if_exists(review_path)
     n_review = write_review_queue(canonical_rows, labels, review_path)
     print(f"Review queue: {n_review} items -> {review_path}")
 
     # Diagnostics
     dd_path = gen_dir / f"DDCheck_{month_str}.csv"
     cat_path = gen_dir / f"CatCheck_{month_str}.csv"
+    _backup_if_exists(dd_path)
+    _backup_if_exists(cat_path)
     write_diagnostic_ddcheck(canonical_rows, labels, dd_path)
     write_diagnostic_catcheck(canonical_rows, labels, cat_path)
     print(f"Diagnostics: {dd_path}, {cat_path}")
@@ -239,7 +255,7 @@ def finalize_month(
     if not source.exists():
         raise FileNotFoundError(f"Draft not found: {source}")
 
-    import shutil
+    _backup_if_exists(dest)
     shutil.copy2(source, dest)
     print(f"Finalized: {dest}")
 
@@ -247,6 +263,7 @@ def finalize_month(
     source_csv = gen_dir / f"{month_str}_codedAndCategorised.csv"
     if source_csv.exists():
         dest_csv = checked_dir / f"{month_str}_codedAndCategorised.csv"
+        _backup_if_exists(dest_csv)
         shutil.copy2(source_csv, dest_csv)
 
     return dest

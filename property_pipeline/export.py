@@ -18,7 +18,14 @@ def build_output_dataframe(transactions: list[dict], labels: list[dict]) -> pd.D
 
     merged = tx_df.merge(lab_df, on="tx_id", how="left")
 
-    merged["Date"] = pd.to_datetime(merged["posted_date"], format="%Y-%m-%d")
+    # posted_date should be YYYY-MM-DD; coerce and handle bad/mixed data
+    date_ser = merged["posted_date"].astype(str)
+    merged["Date"] = pd.to_datetime(date_ser, format="%Y-%m-%d", errors="coerce")
+    bad = merged["Date"].isna() & (date_ser != "").values
+    if bad.any():
+        merged.loc[bad, "Date"] = pd.to_datetime(date_ser[bad], dayfirst=True, errors="coerce")
+    # Drop rows where date could not be parsed (e.g. wrong column data)
+    merged = merged.dropna(subset=["Date"])
     merged["Account"] = merged["source_account"]
     merged["Amount"] = merged["amount"]
     merged["Subcategory"] = merged["effective_subcategory"]
