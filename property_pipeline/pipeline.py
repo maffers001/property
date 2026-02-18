@@ -253,7 +253,9 @@ def finalize_month(
     dest = checked_dir / f"{month_str}_codedAndCategorised.xlsx"
 
     if not source.exists():
-        raise FileNotFoundError(f"Draft not found: {source}")
+        raise FileNotFoundError(
+            f"Draft not found: {source}. Run 'python -m property_pipeline run_month {month_str}' first to create it."
+        )
 
     _backup_if_exists(dest)
     shutil.copy2(source, dest)

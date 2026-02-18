@@ -51,6 +51,44 @@ So backtest never opens `labels.db`. It only needs bank files + checked XLSX. Th
 
 Before overwriting any output file, the pipeline creates a timestamped backup (e.g. `OCT2025_codedAndCategorised.xlsx.bak_20250218-143022`). This applies to files written in `generated/`, `review/`, and when running `finalize_month` to `checked/`.
 
+## Where is the database?
+
+The database is a single SQLite file: **`data/property/labels.db`** on your machine (or in the repo). It is created the first time you run `seed_db` or `run_month` — there is no separate database server or container.
+
+- **Running locally:** `python -m property_pipeline run_month OCT2025` creates or uses `data/property/labels.db` on the host.
+- **Running in Docker:** `docker compose run --rm pipeline run_month OCT2025` uses the same path inside the container. Because `./data/property` is mounted into the container, the file is written to `data/property/labels.db` on the host, so you see it in your project folder. The DB is not “inside” the container; it lives in the mounted directory.
+
+So you won’t see a “database” container in Docker — only the pipeline container that reads/writes the SQLite file in the shared volume.
+
+**Why no dedicated DB container?** SQLite is an embedded, file-based database: the database *is* the file. There is no separate server process (unlike PostgreSQL or MySQL). The pipeline opens `labels.db` directly when it runs. So there’s nothing to run in a second container — with SQLite, the “database” is just this file.
+
+## Connect and query the database
+
+**Command line (sqlite3)**  
+If `sqlite3` is installed, open the DB and run SQL:
+
+```bash
+sqlite3 data/property/labels.db
+```
+
+Then e.g. `.tables`, `SELECT * FROM rules LIMIT 5;`, `SELECT * FROM transactions_canonical WHERE import_batch_id = 'OCT2025' LIMIT 10;`. Use `.quit` to exit.
+
+**Python (same as the pipeline)**  
+Use the pipeline’s DB helpers so path and WAL are consistent:
+
+```python
+from property_pipeline.db import get_db
+
+with get_db() as conn:
+    for row in conn.execute("SELECT tx_id, posted_date, amount, memo FROM transactions_canonical WHERE import_batch_id = 'OCT2025' LIMIT 5"):
+        print(dict(row))
+```
+
+Or with a custom path: `get_db("path/to/labels.db")`. Rows are `sqlite3.Row` (e.g. `row["tx_id"]`).
+
+**GUI**  
+Point any SQLite client at `data/property/labels.db`, e.g. [DB Browser for SQLite](https://sqlitebrowser.org/), DBeaver, or the SQLite extension in VS Code.
+
 ## Docker
 
 ```bash
@@ -58,7 +96,7 @@ docker compose build
 docker compose run --rm pipeline run_month OCT2025
 ```
 
-Volumes: `./data/property` is mounted so `labels.db` and outputs persist.
+Volumes: `./data/property` is mounted so `labels.db` and all outputs are created on the host under `data/property/` and persist after the container exits.
 
 ## Outputs
 
