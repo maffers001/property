@@ -82,6 +82,21 @@ def _load_properties_set(conn: sqlite3.Connection) -> set[str]:
     return {row["property_code"] for row in cursor.fetchall()}
 
 
+def _load_rule_performance(conn: sqlite3.Connection) -> dict[str, dict]:
+    """Load rule_id -> {acc_category, acc_subcategory, acc_property} for confidence."""
+    cursor = conn.execute(
+        "SELECT rule_id, acc_category, acc_subcategory, acc_property FROM rule_performance"
+    )
+    return {
+        row["rule_id"]: {
+            "acc_category": row["acc_category"],
+            "acc_subcategory": row["acc_subcategory"],
+            "acc_property": row["acc_property"],
+        }
+        for row in cursor.fetchall()
+    }
+
+
 def _store_raw_rows(conn: sqlite3.Connection, raw_rows: list[dict]) -> int:
     """Insert raw rows, skipping duplicates. Returns count inserted."""
     inserted = 0
@@ -150,11 +165,18 @@ def _store_labels(conn: sqlite3.Connection, labels: list[dict], pipeline_version
     return inserted
 
 
+# ML override: only apply to catch_all or low-confidence rule labels; threshold for accepting ML
+ML_CONFIDENCE_THRESHOLD = 0.9
+ML_APPLY_WHEN_RULE_CONFIDENCE_BELOW = 0.85
+
+
 def run_month(
     month_str: str,
     bank_download_dir: Path | str | None = None,
     db_path: Path | str | None = None,
     output_dir: Path | str | None = None,
+    use_ml: bool = False,
+    model_path: Path | str | None = None,
 ) -> dict:
     """Run the full pipeline for a single month.
 
@@ -163,6 +185,8 @@ def run_month(
         bank_download_dir: override for bank CSV folder
         db_path: override for database path
         output_dir: override for output folder (generated/)
+        use_ml: if True, load ML model and override catch_all / low-confidence labels when ML is confident
+        model_path: path to saved ML model (default from config)
 
     Returns:
         Summary dict with counts.
@@ -183,13 +207,37 @@ def run_month(
         n_canon = _store_canonical_rows(conn, canonical_rows)
         print(f"Stored {n_raw} raw rows, {n_canon} canonical rows (new)")
 
-        # 3. Load rules and properties
+        # 3. Load rules, properties, and rule_performance (for measured confidence)
         rules = _load_rules_from_db(conn)
         properties_set = _load_properties_set(conn)
+        rule_performance = _load_rule_performance(conn)
 
-    # 4. Run engine
-    labels = run_engine(canonical_rows, rules, properties_set)
+    # 4. Run engine (with rule_performance for base confidence when available)
+    labels = run_engine(canonical_rows, rules, properties_set, rule_performance=rule_performance)
     print(f"Engine produced {len(labels)} labels")
+
+    # 4b. Optional ML: override catch_all or low-confidence labels when ML confidence is high
+    if use_ml:
+        from .ml_model import load_model, predict_one
+        from .config import MODEL_PATH
+        path = model_path or MODEL_PATH
+        model = load_model(path)
+        if model is not None:
+            overrides = 0
+            for tx, lab in zip(canonical_rows, labels):
+                if lab.get("rule_strength") != "catch_all" and (lab.get("confidence") or 0) >= ML_APPLY_WHEN_RULE_CONFIDENCE_BELOW:
+                    continue
+                cat, subcat, prop, conf = predict_one(tx, model)
+                if conf >= ML_CONFIDENCE_THRESHOLD:
+                    lab["category"] = cat
+                    lab["subcategory"] = subcat
+                    lab["property_code"] = prop or lab.get("property_code")
+                    lab["confidence"] = conf
+                    lab["source"] = "model"
+                    overrides += 1
+            print(f"ML overrides applied: {overrides}")
+        else:
+            print("ML enabled but no model found; run train_ml first.")
 
     with get_db(db) as conn:
         # 5. Store labels

@@ -18,6 +18,8 @@ def main():
     p_run.add_argument("--bank-dir", help="Bank download directory override")
     p_run.add_argument("--db", help="Database path override")
     p_run.add_argument("--output-dir", help="Output directory override")
+    p_run.add_argument("--use-ml", action="store_true", help="Use ML model to override catch_all / low-confidence labels")
+    p_run.add_argument("--model", help="Path to ML model file (default: data/property/ml_model.joblib)")
 
     # finalize_month
     p_fin = sub.add_parser("finalize_month", help="Copy draft to checked/")
@@ -51,6 +53,11 @@ def main():
     p_grade = sub.add_parser("grade_rules", help="Compute rule_performance from historical labels")
     p_grade.add_argument("--db", help="Database path override")
 
+    # train_ml
+    p_train = sub.add_parser("train_ml", help="Train ML model from historical labels in DB")
+    p_train.add_argument("--db", help="Database path override")
+    p_train.add_argument("--model", help="Output path for model file")
+
     args = parser.parse_args()
 
     if args.command == "run_month":
@@ -60,6 +67,8 @@ def main():
             bank_download_dir=args.bank_dir,
             db_path=args.db,
             output_dir=args.output_dir,
+            use_ml=getattr(args, "use_ml", False),
+            model_path=args.model if getattr(args, "model", None) else None,
         )
         print(f"\nDone. {result['total_transactions']} transactions, {result['needs_review']} need review.")
 
@@ -98,6 +107,16 @@ def main():
     elif args.command == "grade_rules":
         from .historical import grade_rules
         grade_rules(db_path=args.db)
+
+    elif args.command == "train_ml":
+        from .ml_model import train
+        from .config import MODEL_PATH
+        res = train(db_path=args.db, model_path=getattr(args, "model", None) or MODEL_PATH)
+        if res.get("ok"):
+            print(f"Model trained on {res['n']} samples, saved to {res['path']}")
+        else:
+            print(f"Training skipped: {res.get('reason', 'unknown')} (n={res.get('n', 0)})")
+            sys.exit(1)
 
 
 if __name__ == "__main__":

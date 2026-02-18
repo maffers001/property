@@ -18,6 +18,7 @@ pip install -r requirements.txt
 - **Process a month** (reads from `data/property/bank-download/`, writes to `data/property/generated/` and `data/property/review/`):
   ```bash
   python -m property_pipeline run_month OCT2025
+  python -m property_pipeline run_month OCT2025 --use-ml   # use ML for catch-all / low-confidence rows
   ```
 
 - **Finalize** (copy draft to checked folder for 3.0):
@@ -46,6 +47,32 @@ pip install -r requirements.txt
   ```bash
   python -m property_pipeline grade_rules
   ```
+
+- **Train ML model** (trains on historical labels in DB; saves to `data/property/ml_model.joblib`):
+  ```bash
+  python -m property_pipeline train_ml
+  python -m property_pipeline train_ml --db path/to/labels.db --model path/to/model.joblib
+  ```
+  Requires at least 20 labeled transactions. Run after `load_historical` (and optionally `grade_rules`).
+
+## Phase 3: Confidence and optional ML
+
+- **Confidence from rule_performance**  
+  When you run `grade_rules`, the pipeline fills the `rule_performance` table with per-rule accuracy (category, subcategory, property). `run_month` loads this and uses it to set **base confidence**: if the winning rule has measured accuracy, confidence is derived from that (blended with strength-based fallback). Rules without performance data still use strength-only confidence.
+
+- **Optional ML model**  
+  An ML model can suggest labels for transactions where the rule engine is weak (e.g. catch-all or low confidence). Regex rules keep **precedence**: ML only overrides when the rule label is from a catch-all rule or confidence is below 0.85, and only when the ML prediction confidence is above 0.9. Corrections you make (e.g. via review) stay in `transactions_labels` and can be used the next time you run `train_ml`.
+
+  - **Train the model** (after loading historical labels):
+    ```bash
+    python -m property_pipeline train_ml
+    ```
+  - **Use ML in run_month**:
+    ```bash
+    python -m property_pipeline run_month OCT2025 --use-ml
+    python -m property_pipeline run_month OCT2025 --use-ml --model path/to/ml_model.joblib
+    ```
+  Model path defaults to `data/property/ml_model.joblib` (overridable with `MODEL_PATH` or `--model`).
 
 ## Why backtest doesn't use the database
 

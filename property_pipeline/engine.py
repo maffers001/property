@@ -85,13 +85,20 @@ def _matches_pattern(pattern: str, tx: dict, labels: dict) -> bool:
         return False
 
 
-def run_engine(transactions: list[dict], rules: list[dict], properties_set: set[str] | None = None) -> list[dict]:
+def run_engine(
+    transactions: list[dict],
+    rules: list[dict],
+    properties_set: set[str] | None = None,
+    rule_performance: dict[str, dict] | None = None,
+) -> list[dict]:
     """Run the four-pass rule engine over a list of canonical transactions.
 
     Args:
         transactions: list of canonical transaction dicts
         rules: list of rule dicts (all phases, will be sorted)
         properties_set: set of valid property codes for validation
+        rule_performance: optional dict rule_id -> {acc_category, acc_subcategory, acc_property}
+                          used to set base confidence from measured accuracy
 
     Returns:
         list of label dicts, one per transaction, with keys:
@@ -196,7 +203,24 @@ def run_engine(transactions: list[dict], rules: list[dict], properties_set: set[
             best_rule_id = best_rule.get("rule_id")
             best_strength = best_rule.get("strength", "medium")
 
-        confidence = STRENGTH_CONFIDENCE.get(best_strength, 0.65)
+        # Base confidence: from rule_performance (measured accuracy) if available, else strength
+        if rule_performance and best_rule_id and best_rule_id in rule_performance:
+            perf = rule_performance[best_rule_id]
+            accs = []
+            if perf.get("acc_category") is not None:
+                accs.append(perf["acc_category"])
+            if perf.get("acc_subcategory") is not None:
+                accs.append(perf["acc_subcategory"])
+            if perf.get("acc_property") is not None:
+                accs.append(perf["acc_property"])
+            if accs:
+                measured = sum(accs) / len(accs)
+                strength_val = STRENGTH_CONFIDENCE.get(best_strength, 0.65)
+                confidence = min(0.99, max(measured * 0.95, strength_val))
+            else:
+                confidence = STRENGTH_CONFIDENCE.get(best_strength, 0.65)
+        else:
+            confidence = STRENGTH_CONFIDENCE.get(best_strength, 0.65)
 
         needs_review = 0
         if confidence < CONFIDENCE_FORCE_REVIEW:

@@ -11,6 +11,7 @@ CHECKED_DIR = BASE_DIR / "checked"
 REVIEW_DIR = BASE_DIR / "review"
 
 DB_PATH = Path(os.environ.get("DB_PATH", str(BASE_DIR / "labels.db")))
+MODEL_PATH = Path(os.environ.get("MODEL_PATH", str(BASE_DIR / "ml_model.joblib")))
 
 RSA_CAPITAL_DATE = "2022-08-01"
 
