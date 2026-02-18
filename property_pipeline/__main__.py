@@ -40,6 +40,17 @@ def main():
     p_seed = sub.add_parser("seed_db", help="Initialise DB and seed rules/properties")
     p_seed.add_argument("--db", help="Database path override")
 
+    # load_historical
+    p_load = sub.add_parser("load_historical", help="Bulk load checked XLSX ground truth into DB")
+    p_load.add_argument("--months", nargs="*", help="Months to load (default: all with XLSX in checked/)")
+    p_load.add_argument("--bank-dir", help="Bank download directory override")
+    p_load.add_argument("--checked-dir", help="Checked directory override")
+    p_load.add_argument("--db", help="Database path override")
+
+    # grade_rules
+    p_grade = sub.add_parser("grade_rules", help="Compute rule_performance from historical labels")
+    p_grade.add_argument("--db", help="Database path override")
+
     args = parser.parse_args()
 
     if args.command == "run_month":
@@ -71,6 +82,22 @@ def main():
         from .pipeline import seed_db
         seed_db(db_path=args.db)
         print("Database seeded.")
+
+    elif args.command == "load_historical":
+        from .historical import load_historical_into_db
+        bd = Path(args.bank_dir) if args.bank_dir else None
+        cd = Path(args.checked_dir) if args.checked_dir else None
+        result = load_historical_into_db(
+            months=args.months,
+            bank_download_dir=bd,
+            checked_dir=cd,
+            db_path=args.db,
+        )
+        print(f"\nLoaded {result['total_labels']} manual labels from {len(result['by_month'])} months.")
+
+    elif args.command == "grade_rules":
+        from .historical import grade_rules
+        grade_rules(db_path=args.db)
 
 
 if __name__ == "__main__":

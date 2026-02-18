@@ -36,6 +36,17 @@ pip install -r requirements.txt
   python -m property_pipeline backtest --months OCT2025 SEP2025
   ```
 
+- **Load historical ground truth** (bulk import checked XLSX into DB as manual labels):
+  ```bash
+  python -m property_pipeline load_historical
+  python -m property_pipeline load_historical --months OCT2025 SEP2025
+  ```
+
+- **Grade rules** (compute rule_performance from historical labels; run after load_historical):
+  ```bash
+  python -m property_pipeline grade_rules
+  ```
+
 ## Why backtest doesn't use the database
 
 **Backtest** uses a separate, self-contained path so you can measure accuracy without touching the DB or running the full pipeline:
