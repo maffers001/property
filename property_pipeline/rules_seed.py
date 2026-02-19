@@ -482,3 +482,22 @@ def get_all_rules():
         + _build_subcategory_rules()
         + _build_override_rules()
     )
+
+
+def get_categories_and_subcategories():
+    """Return (sorted list of category names, sorted list of subcategory names) from all rules.
+
+    Used to populate Excel validation dropdowns; users can add new values in the Lists sheet.
+    """
+    categories = set()
+    subcategories = set()
+    for r in get_all_rules():
+        try:
+            out = json.loads(r.get("outputs_json") or "{}")
+            if out.get("category"):
+                categories.add(out["category"])
+            if out.get("subcategory"):
+                subcategories.add(out["subcategory"])
+        except (json.JSONDecodeError, TypeError):
+            pass
+    return (sorted(categories), sorted(subcategories))

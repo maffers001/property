@@ -145,7 +145,10 @@ After `run_month MMMYYYY` you get:
 - **`generated/DDCheck_MMMYYYY.csv`** – diagnostic: direct debits and Beals only (rows where `effective_subcategory` contains “Direct Debit” or `memo` matches `BEALS...`). For checking mortgage/DD lines.
 - **`generated/CatCheck_MMMYYYY.csv`** – diagnostic: all categorised transactions (canonical + labels merged, sorted by date). Full list for category/audit checks.
 
-After manual check, run `finalize_month MMMYYYY` to copy the draft to `checked/` for the monthly statement notebook.
+**Dropdown validation in XLSX**  
+The draft and review queue XLSX files include a **Lists** sheet and Excel data validation (dropdowns) on the Property, Cat, and Subcat columns. The **Lists** sheet has three columns (Property, Category, Subcategory) pre-filled from the pipeline; the validation range includes extra blank rows. **To add a new category, subcategory, or property code:** type it into the next blank row in the appropriate column on the **Lists** sheet — it will then appear in the dropdowns on the Data/Review sheet.
+</think><｜tool▁call▁begin｜>
+ReadLints
 
 ## Review process
 

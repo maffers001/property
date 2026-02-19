@@ -16,7 +16,7 @@ from .export import (
     build_output_dataframe, write_xlsx, write_csv,
     write_review_queue, write_diagnostic_ddcheck, write_diagnostic_catcheck,
 )
-from .rules_seed import get_all_rules, PROPERTIES_SEED
+from .rules_seed import get_all_rules, get_categories_and_subcategories, PROPERTIES_SEED
 
 
 def _backup_if_exists(filepath: Path) -> None:
@@ -289,11 +289,19 @@ def run_month(
 
     output_df = build_output_dataframe(canonical_rows, labels)
 
+    categories, subcategories = get_categories_and_subcategories()
+    property_codes_list = sorted(properties_set) if properties_set else []
+
     draft_xlsx = gen_dir / f"{month_str}_codedAndCategorised.xlsx"
     draft_csv = gen_dir / f"{month_str}_codedAndCategorised.csv"
     _backup_if_exists(draft_xlsx)
     _backup_if_exists(draft_csv)
-    write_xlsx(output_df, draft_xlsx)
+    write_xlsx(
+        output_df, draft_xlsx,
+        property_codes=property_codes_list,
+        categories=categories,
+        subcategories=subcategories,
+    )
     write_csv(output_df, draft_csv)
     print(f"Draft written: {draft_xlsx}")
 
@@ -302,7 +310,12 @@ def run_month(
     review_dir.mkdir(parents=True, exist_ok=True)
     review_path = review_dir / f"review_queue_{month_str}.xlsx"
     _backup_if_exists(review_path)
-    n_review = write_review_queue(canonical_rows, labels, review_path)
+    n_review = write_review_queue(
+        canonical_rows, labels, review_path,
+        property_codes=property_codes_list,
+        categories=categories,
+        subcategories=subcategories,
+    )
     print(f"Review queue: {n_review} items -> {review_path}")
 
     # Diagnostics
@@ -358,11 +371,21 @@ def finalize_month(
 
     output_df = build_output_dataframe(canonical_rows, ordered_labels)
 
+    with get_db(db) as conn:
+        properties_set = _load_properties_set(conn)
+    property_codes_list = sorted(properties_set) if properties_set else []
+    categories, subcategories = get_categories_and_subcategories()
+
     dest_xlsx = checked_dir / f"{month_str}_codedAndCategorised.xlsx"
     dest_csv = checked_dir / f"{month_str}_codedAndCategorised.csv"
     _backup_if_exists(dest_xlsx)
     _backup_if_exists(dest_csv)
-    write_xlsx(output_df, dest_xlsx)
+    write_xlsx(
+        output_df, dest_xlsx,
+        property_codes=property_codes_list,
+        categories=categories,
+        subcategories=subcategories,
+    )
     write_csv(output_df, dest_csv)
 
     # Update draft in generated/ so it matches what we finalized
@@ -370,7 +393,12 @@ def finalize_month(
     draft_csv = gen_dir / f"{month_str}_codedAndCategorised.csv"
     _backup_if_exists(draft_xlsx)
     _backup_if_exists(draft_csv)
-    write_xlsx(output_df, draft_xlsx)
+    write_xlsx(
+        output_df, draft_xlsx,
+        property_codes=property_codes_list,
+        categories=categories,
+        subcategories=subcategories,
+    )
     write_csv(output_df, draft_csv)
 
     return dest_xlsx
