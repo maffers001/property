@@ -155,7 +155,7 @@ The review queue is the list of transactions the pipeline is unsure about. You c
 ```bash
 python -m property_pipeline run_month OCT2025
 ```
-This creates the main draft and **`review/review_queue_OCT2025.xlsx`**: only transactions with `needs_review=1` (e.g. low confidence, catch-all rule, or below auto-accept threshold).
+This creates the main draft and **`review/review_queue_OCT2025.xlsx`**: transactions with `needs_review=1` (e.g. low confidence, catch-all rule, or below auto-accept threshold). **OurRent**, **PropertyExpense**, and **Mortgage** transactions without a property code are always added to the review queue so you can assign one.
 
 **Step 2 – Open and edit the review queue**  
 - Open `data/property/review/review_queue_MMMYYYY.xlsx`.  
@@ -170,11 +170,11 @@ python -m property_pipeline review_month OCT2025
 The script reads the saved review queue and, for each row in it, inserts a new label version in `transactions_labels` with `source='manual'`, `confidence=1.0`, and `reviewed=1`. Those corrections are then used by `grade_rules` and `train_ml`.
 
 **Step 4 – Finalize**  
-When the draft (and any review edits) are correct, copy it to `checked/` for the monthly statement:
+When you’re ready, build the final file from the database and write it to `checked/`:
 ```bash
 python -m property_pipeline finalize_month OCT2025
 ```
-You can run `finalize_month` more than once: each time it backs up the existing file in `checked/` (timestamped) then copies the current draft from `generated/` over. The **draft in `generated/` is not updated when you run `review_month`** — the draft is only written by `run_month`. Corrections you apply via the review queue are stored in the database (for `grade_rules` and `train_ml`), but the draft file still has the labels from the last `run_month`. To have your manual corrections in the finalized file, edit the draft XLSX/CSV in `generated/` to match your fixes, then run `finalize_month`.
+`finalize_month` **builds the output from the database** (canonical transactions plus latest label per transaction), so any corrections you applied with `review_month` are included. It writes to `checked/` and also updates the draft in `generated/` so both stay in sync. You can run it more than once; each run backs up existing files (timestamped) then overwrites with the current DB-backed output.
 
 **Correcting transactions that weren’t in the review queue**  
 If you spot an error on a transaction that was *not* flagged for review (e.g. the pipeline was confident but wrong), add it to the review queue: open `review/review_queue_MMMYYYY.xlsx`, add a row with the same columns (at least **tx_id**, **property_code**, **category**, **subcategory** — you can copy a row from the main draft and fix the three label fields). Save, then run `review_month MMMYYYY`. The script applies every row in the file; it doesn’t matter whether the row was originally in the queue.

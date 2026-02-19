@@ -229,6 +229,11 @@ def run_engine(
             needs_review = 1
         elif confidence < CONFIDENCE_AUTO_ACCEPT:
             needs_review = 1
+        # OurRent, PropertyExpense, Mortgage require a property code; if missing, force review
+        prop = (labels.get("property_code") or "").strip()
+        cat = (labels.get("category") or "").strip()
+        if cat in ("OurRent", "PropertyExpense", "Mortgage") and not prop:
+            needs_review = 1
 
         results.append({
             "tx_id": tx["tx_id"],

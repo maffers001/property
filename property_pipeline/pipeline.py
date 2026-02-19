@@ -97,6 +97,46 @@ def _load_rule_performance(conn: sqlite3.Connection) -> dict[str, dict]:
     }
 
 
+def _load_canonical_for_month(conn: sqlite3.Connection, month_str: str) -> list[dict]:
+    """Load canonical transactions for a given import_batch_id (month)."""
+    cursor = conn.execute(
+        """SELECT * FROM transactions_canonical
+           WHERE import_batch_id = ? AND is_superseded = 0
+           ORDER BY posted_date, tx_id""",
+        (month_str,),
+    )
+    return [dict(row) for row in cursor.fetchall()]
+
+
+def _load_latest_labels_for_tx_ids(conn: sqlite3.Connection, tx_ids: list[str]) -> list[dict]:
+    """Load latest label version per tx_id for the given tx_ids. Returns list of label dicts."""
+    if not tx_ids:
+        return []
+    placeholders = ",".join(["?"] * len(tx_ids))
+    cursor = conn.execute(
+        f"""
+        SELECT l.tx_id, l.property_code, l.category, l.subcategory
+        FROM transactions_labels l
+        INNER JOIN (
+            SELECT tx_id, MAX(label_version) AS mv FROM transactions_labels
+            WHERE tx_id IN ({placeholders}) GROUP BY tx_id
+        ) m ON l.tx_id = m.tx_id AND l.label_version = m.mv
+        WHERE l.tx_id IN ({placeholders})
+        """,
+        tx_ids + tx_ids,
+    )
+    return [
+        {
+            "tx_id": row["tx_id"],
+            "property_code": row["property_code"] or "",
+            "category": row["category"] or "",
+            "subcategory": row["subcategory"] or "",
+            "description": "",
+        }
+        for row in cursor.fetchall()
+    ]
+
+
 def _store_raw_rows(conn: sqlite3.Connection, raw_rows: list[dict]) -> int:
     """Insert raw rows, skipping duplicates. Returns count inserted."""
     inserted = 0
@@ -288,34 +328,52 @@ def finalize_month(
     db_path: Path | str | None = None,
     source_dir: Path | str | None = None,
 ) -> Path:
-    """Copy the draft output to checked/ as the final file.
+    """Build the finalized output from the DB (canonical + latest labels) and write to checked/.
 
-    In a full workflow this would re-read from DB with any manual corrections.
-    For now it copies from generated/ to checked/.
+    Uses the database so that manual corrections applied via review_month are included.
+    Also updates the draft in generated/ so it stays in sync.
     """
+    db = db_path or DB_PATH
     gen_dir = Path(source_dir) if source_dir else GENERATED_DIR
     checked_dir = CHECKED_DIR
     checked_dir.mkdir(parents=True, exist_ok=True)
+    gen_dir.mkdir(parents=True, exist_ok=True)
 
-    source = gen_dir / f"{month_str}_codedAndCategorised.xlsx"
-    dest = checked_dir / f"{month_str}_codedAndCategorised.xlsx"
-
-    if not source.exists():
+    with get_db(db) as conn:
+        canonical_rows = _load_canonical_for_month(conn, month_str)
+    if not canonical_rows:
         raise FileNotFoundError(
-            f"Draft not found: {source}. Run 'python -m property_pipeline run_month {month_str}' first to create it."
+            f"No canonical transactions for {month_str}. Run 'python -m property_pipeline run_month {month_str}' first."
         )
 
-    _backup_if_exists(dest)
-    shutil.copy2(source, dest)
+    tx_ids = [r["tx_id"] for r in canonical_rows]
+    with get_db(db) as conn:
+        labels = _load_latest_labels_for_tx_ids(conn, tx_ids)
+    # Map by tx_id so we can preserve order and handle any missing labels
+    labels_by_tx = {lab["tx_id"]: lab for lab in labels}
+    ordered_labels = [
+        labels_by_tx.get(tx_id, {"tx_id": tx_id, "property_code": "", "category": "", "subcategory": "", "description": ""})
+        for tx_id in tx_ids
+    ]
 
-    # Also copy CSV
-    source_csv = gen_dir / f"{month_str}_codedAndCategorised.csv"
-    if source_csv.exists():
-        dest_csv = checked_dir / f"{month_str}_codedAndCategorised.csv"
-        _backup_if_exists(dest_csv)
-        shutil.copy2(source_csv, dest_csv)
+    output_df = build_output_dataframe(canonical_rows, ordered_labels)
 
-    return dest
+    dest_xlsx = checked_dir / f"{month_str}_codedAndCategorised.xlsx"
+    dest_csv = checked_dir / f"{month_str}_codedAndCategorised.csv"
+    _backup_if_exists(dest_xlsx)
+    _backup_if_exists(dest_csv)
+    write_xlsx(output_df, dest_xlsx)
+    write_csv(output_df, dest_csv)
+
+    # Update draft in generated/ so it matches what we finalized
+    draft_xlsx = gen_dir / f"{month_str}_codedAndCategorised.xlsx"
+    draft_csv = gen_dir / f"{month_str}_codedAndCategorised.csv"
+    _backup_if_exists(draft_xlsx)
+    _backup_if_exists(draft_csv)
+    write_xlsx(output_df, draft_xlsx)
+    write_csv(output_df, draft_csv)
+
+    return dest_xlsx
 
 
 def review_month(
