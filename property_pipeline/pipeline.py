@@ -307,7 +307,6 @@ def finalize_month(
 
     _backup_if_exists(dest)
     shutil.copy2(source, dest)
-    print(f"Finalized: {dest}")
 
     # Also copy CSV
     source_csv = gen_dir / f"{month_str}_codedAndCategorised.csv"

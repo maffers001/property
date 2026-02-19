@@ -174,6 +174,11 @@ When the draft (and any review edits) are correct, copy it to `checked/` for the
 ```bash
 python -m property_pipeline finalize_month OCT2025
 ```
+You can run `finalize_month` more than once: each time it backs up the existing file in `checked/` (timestamped) then copies the current draft from `generated/` over. The **draft in `generated/` is not updated when you run `review_month`** — the draft is only written by `run_month`. Corrections you apply via the review queue are stored in the database (for `grade_rules` and `train_ml`), but the draft file still has the labels from the last `run_month`. To have your manual corrections in the finalized file, edit the draft XLSX/CSV in `generated/` to match your fixes, then run `finalize_month`.
 
-**Why were some Barclays rows blank?**  
-If you saw rows in the review queue with no date, amount, or memo (especially Barclays), those came from **incomplete lines in the bank CSV** (e.g. footers or malformed rows). The Barclays importer now **skips** rows that have no date, zero amount, and no memo, so they no longer appear as transactions or in the review queue. Re-run `run_month` after updating the pipeline to drop them from future runs; for an existing review file, you can delete those blank rows and run `review_month` as usual.
+**Correcting transactions that weren’t in the review queue**  
+If you spot an error on a transaction that was *not* flagged for review (e.g. the pipeline was confident but wrong), add it to the review queue: open `review/review_queue_MMMYYYY.xlsx`, add a row with the same columns (at least **tx_id**, **property_code**, **category**, **subcategory** — you can copy a row from the main draft and fix the three label fields). Save, then run `review_month MMMYYYY`. The script applies every row in the file; it doesn’t matter whether the row was originally in the queue.
+
+**Running review_month more than once**  
+You can run `review_month` again after making further corrections: edit the review queue, save, and run the command again. Each run inserts a **new** label version for every row in the file (it does not check if the values changed). So running it multiple times when you have new edits is fine and intended. Note that `review_month` is **not idempotent**: if you run it again with the same file and no edits, you will get duplicate label versions (same content, higher version numbers). The “current” label (latest version) is still correct, but avoid re-running with an unchanged file.
+
