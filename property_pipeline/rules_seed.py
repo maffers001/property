@@ -86,7 +86,14 @@ _mortgage_map_raw = [
 ]
 
 # Sub-phase 1b: allocate_codes_for_rents_and_expenses (no subcategory filter)
+# Memo-suffix rules first (code at end of memo): match before broader patterns
 _rent_expense_map_raw = [
+    (r'.*17\s+4-6.*', 'F1746ALH'),       # e.g. CLASSIC CARPETS ... 1586 17 4-6 carper
+    (r'.*\s41214\s.*', 'F41214ALH'),    # e.g. A Beck ... 25658 41214 GS rem
+    (r'.*\s31214\s.*', 'F31214ALH'),    # e.g. A Beck ... 25755 31214 GS
+    (r'.*7\s+8\s.*', 'F78ALH'),         # e.g. Jijo George 99 7 8 bath repair
+    (r'.*13\s+16-18.*', 'F131618ALH'),  # e.g. PCC ... flat 13 16-18 empty...
+    (r'.*12\s+1618.*', 'F121618ALH'),   # e.g. Salvatore Mulara 12 1618 ref
     (r'.*1[ ]?321.*|.*Soumya.*|.*.Chowdhury.*', 'F1321LON'),
     (r'.*2[ ]?321.*|.*CIPRIAN.*', 'F2321LON'),
     (r'.*3[ ]?321.*|.*Ibiyemi.*|.*.Shubhi.*|.*Connacher.*', 'F3321LON'),
