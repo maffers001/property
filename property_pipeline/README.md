@@ -138,9 +138,42 @@ Volumes: `./data/property` is mounted so `labels.db` and all outputs are created
 
 ## Outputs
 
-- `generated/MMMYYYY_codedAndCategorised.xlsx` (and .csv) – draft for manual check
-- `review/review_queue_MMMYYYY.xlsx` – rows with needs_review=1
-- `generated/DDCheck_MMMYYYY.csv` – direct debits + Beals
-- `generated/CatCheck_MMMYYYY.csv` – all categorised rows
+After `run_month MMMYYYY` you get:
 
-After manual check, run `finalize_month MMMYYYY` to copy to `checked/` for the monthly statement notebook.
+- **`generated/MMMYYYY_codedAndCategorised.xlsx`** (and .csv) – main draft: all transactions with property/category/subcategory and confidence. Use this for manual check and as the source for finalizing.
+- **`review/review_queue_MMMYYYY.xlsx`** – subset of rows that need human review (`needs_review=1`, e.g. low confidence or force-review threshold). Same columns as the draft but only the flagged rows.
+- **`generated/DDCheck_MMMYYYY.csv`** – diagnostic: direct debits and Beals only (rows where `effective_subcategory` contains “Direct Debit” or `memo` matches `BEALS...`). For checking mortgage/DD lines.
+- **`generated/CatCheck_MMMYYYY.csv`** – diagnostic: all categorised transactions (canonical + labels merged, sorted by date). Full list for category/audit checks.
+
+After manual check, run `finalize_month MMMYYYY` to copy the draft to `checked/` for the monthly statement notebook.
+
+## Review process
+
+The review queue is the list of transactions the pipeline is unsure about. You correct them in the queue file, then write those corrections back into the database.
+
+**Step 1 – Run the pipeline**  
+```bash
+python -m property_pipeline run_month OCT2025
+```
+This creates the main draft and **`review/review_queue_OCT2025.xlsx`**: only transactions with `needs_review=1` (e.g. low confidence, catch-all rule, or below auto-accept threshold).
+
+**Step 2 – Open and edit the review queue**  
+- Open `data/property/review/review_queue_MMMYYYY.xlsx`.  
+- For each row, fix **property_code**, **category**, and **subcategory** if they’re wrong.  
+- You can **delete rows** you don’t want to change (e.g. junk or duplicates); `review_month` only applies rows that are still in the file.  
+- Save the file.
+
+**Step 3 – Apply corrections to the database**  
+```bash
+python -m property_pipeline review_month OCT2025
+```
+The script reads the saved review queue and, for each row in it, inserts a new label version in `transactions_labels` with `source='manual'`, `confidence=1.0`, and `reviewed=1`. Those corrections are then used by `grade_rules` and `train_ml`.
+
+**Step 4 – Finalize**  
+When the draft (and any review edits) are correct, copy it to `checked/` for the monthly statement:
+```bash
+python -m property_pipeline finalize_month OCT2025
+```
+
+**Why were some Barclays rows blank?**  
+If you saw rows in the review queue with no date, amount, or memo (especially Barclays), those came from **incomplete lines in the bank CSV** (e.g. footers or malformed rows). The Barclays importer now **skips** rows that have no date, zero amount, and no memo, so they no longer appear as transactions or in the review queue. Re-run `run_month` after updating the pipeline to drop them from future runs; for an existing review file, you can delete those blank rows and run `review_month` as usual.

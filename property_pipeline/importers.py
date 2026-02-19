@@ -127,6 +127,10 @@ def load_barclays(filepath: str | Path, import_batch_id: str) -> tuple[list[dict
             None, None, memo_combined, bank_txn_number, row_number,
         )
 
+        # Skip rows with no usable transaction data (e.g. footer/blank lines in Barclays CSV)
+        if not posted_date and amount == 0 and not memo_combined.strip():
+            continue
+
         match_text = _build_match_text(None, None, memo_combined, None)
 
         canonical_rows.append({
