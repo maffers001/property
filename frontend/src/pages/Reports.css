@@ -1,0 +1,70 @@
+.reports-page h1 {
+  margin-top: 0;
+}
+
+.reports-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.reports-controls label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.reports-controls select {
+  padding: 0.4rem;
+}
+
+.reports-controls button {
+  padding: 0.5rem 1rem;
+  background: #3d3d6b;
+  color: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.report-section {
+  margin-top: 2rem;
+}
+
+.report-section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.report-chart {
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 1rem;
+}
+
+.report-table {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.report-table th,
+.report-table td {
+  padding: 0.4rem 0.6rem;
+  text-align: right;
+  border-bottom: 1px solid #333;
+}
+
+.report-table th:first-child,
+.report-table td:first-child {
+  text-align: left;
+}
+
+.report-table th {
+  background: #1a1a2e;
+}

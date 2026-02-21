@@ -20,6 +20,7 @@ pip install -r requirements.txt
   python -m property_pipeline run_month OCT2025
   python -m property_pipeline run_month OCT2025 --use-ml   # use ML for catch-all / low-confidence rows
   ```
+  Re-running for the same month **cleans that month’s data first** (canonical, labels, raw rows), then re-imports from the bank files, so you get a full replace. Trailing blank lines in Barclays and Starling CSVs are skipped and not stored as transactions.
 
 - **Finalize** (copy draft to checked folder for 3.0):
   ```bash

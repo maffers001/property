@@ -115,6 +115,12 @@ CREATE TABLE IF NOT EXISTS config (
     value TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS custom_list_entries (
+    list_type TEXT NOT NULL,
+    value     TEXT NOT NULL,
+    PRIMARY KEY (list_type, value)
+);
+
 CREATE INDEX IF NOT EXISTS idx_canonical_batch ON transactions_canonical(import_batch_id);
 CREATE INDEX IF NOT EXISTS idx_canonical_date ON transactions_canonical(posted_date);
 CREATE INDEX IF NOT EXISTS idx_labels_txid ON transactions_labels(tx_id);

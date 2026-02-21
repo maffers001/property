@@ -137,6 +137,19 @@ def _load_latest_labels_for_tx_ids(conn: sqlite3.Connection, tx_ids: list[str]) 
     ]
 
 
+def _clear_month(conn: sqlite3.Connection, month_str: str) -> None:
+    """Remove all stored data for this import_batch_id so re-import replaces it.
+    Order: labels (FK to canonical), then canonical, then raw.
+    """
+    conn.execute(
+        "DELETE FROM transactions_labels WHERE tx_id IN "
+        "(SELECT tx_id FROM transactions_canonical WHERE import_batch_id = ?)",
+        (month_str,),
+    )
+    conn.execute("DELETE FROM transactions_canonical WHERE import_batch_id = ?", (month_str,))
+    conn.execute("DELETE FROM raw_import_rows WHERE import_batch_id = ?", (month_str,))
+
+
 def _store_raw_rows(conn: sqlite3.Connection, raw_rows: list[dict]) -> int:
     """Insert raw rows, skipping duplicates. Returns count inserted."""
     inserted = 0
@@ -242,6 +255,8 @@ def run_month(
     print(f"Loaded {len(canonical_rows)} transactions for {month_str}")
 
     with get_db(db) as conn:
+        # 1b. Clear existing data for this month so re-import replaces it (no duplicate/skip)
+        _clear_month(conn, month_str)
         # 2. Store in DB
         n_raw = _store_raw_rows(conn, raw_rows)
         n_canon = _store_canonical_rows(conn, canonical_rows)

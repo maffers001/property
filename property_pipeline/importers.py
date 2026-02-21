@@ -233,6 +233,10 @@ def load_starling(filepath: str | Path, import_batch_id: str) -> tuple[list[dict
             counterparty, reference, memo, None, row_number,
         )
 
+        # Skip rows with no usable transaction data (e.g. trailing blank lines in Starling CSV)
+        if not posted_date and amount == 0 and not (memo or counterparty or reference or notes):
+            continue
+
         match_text = _build_match_text(counterparty, reference, memo, txn_type)
 
         canonical_rows.append({
