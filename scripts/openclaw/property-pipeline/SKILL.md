@@ -7,6 +7,8 @@ description: Property rental analytics—bank CSVs from four accounts (Starling 
 
 Use this skill when the user asks to **import bank data**, **process a month**, **check for new downloads**, **do the review**, **finalize**, or run **property reports**. All commands assume the repo root is the current working directory (e.g. `/home/openclaw/code/property` or project root).
 
+**Requirements:** The pipeline and Review App require **Python 3.13.11**.
+
 ## Background: what the pipeline is for
 
 The pipeline supports **property rental analytics**: it turns raw bank exports into categorised transaction data used for the **monthly rent statement** and **financial summary**. Four bank accounts are combined each month:
@@ -44,20 +46,36 @@ The pipeline supports **property rental analytics**: it turns raw bank exports i
 | List months that have been processed / have data | `python scripts/check_bank_downloads.py` or list `data/property/generated/` for `*_codedAndCategorised.*` |
 | Run pipeline for one month only | `python -m property_pipeline run_month MMMYYYY` |
 | Wipe the database | `python scripts/wipe_db.py` (script will prompt for confirmation). |
-| Seed the database (first-time or reset rules/properties) | `python -m property_pipeline seed_db` |
+| Seed the database (first-time or reset rules/properties) | From repo root: `python -m property_pipeline seed_db`. See §4 for details. |
 | Run reports (summary, outgoings, etc.) | Start the backend and tell the user to open the Reports page, or run the report_summary module if they want CLI/JSON. |
 | Backtest rules vs checked XLSX | `python -m property_pipeline backtest` or `--months OCT2025 SEP2025` |
 | Load historical labels from checked XLSX | `python -m property_pipeline load_historical` |
 | Grade rules / train ML | `python -m property_pipeline grade_rules`, then `python -m property_pipeline train_ml` |
 
-## 4. Paths (repo-relative)
+## 4. Seeding the database
+
+The pipeline and Review App use a SQLite database at `data/property/labels.db`. It must exist and have all tables before running `run_month` or the Review App (otherwise the app returns 500 on endpoints like `/api/months`).
+
+**How to seed the database** (from repo root):
+
+```bash
+python -m property_pipeline seed_db
+```
+
+- **When to run:** Before the first `run_month` or before starting the Review App; also after wiping the DB with `scripts/wipe_db.py` if you want to use the app again.
+- **What it does:** Creates `data/property/labels.db` if missing, creates all tables (e.g. `transactions_canonical`, `transactions_labels`, `rules`, `properties`, `custom_list_entries`), and seeds rules and property codes from the pipeline’s seed data.
+- **Custom paths:** If you use a different data location, set `DATA_PATH` or `DB_PATH` when running the app and when running `seed_db`, e.g. `DATA_PATH=/var/lib/property python -m property_pipeline seed_db`.
+
+After seeding, `/api/months` will return an empty list until you run `run_month MMMYYYY` for at least one month (with bank files in `data/property/bank-download/`).
+
+## 5. Paths (repo-relative)
 
 - **Bank inputs:** `data/property/bank-download/` (BC_4040_MMMYYYY.csv, BC_3072_MMMYYYY.csv, BC_6045_MMMYYYY.csv, StarlingStatement_YYYY-MM.csv)
 - **Pipeline outputs:** `data/property/generated/`, `data/property/review/` (review_queue_MMMYYYY.xlsx)
 - **Final checked (for 3.0 statement):** `data/property/checked/`
 - **Database:** `data/property/labels.db` (or `DB_PATH` env)
 
-## 5. Review app (optional)
+## 6. Review app (optional)
 
 The **Review App** is a web UI (React frontend + FastAPI backend) for reviewing and correcting transaction labels. It reads and writes the same database and files as the pipeline, so the user can use it instead of editing the review queue XLSX in Excel. Changes are saved immediately to the DB, and the review queue spreadsheet is updated after each correction so partial progress is preserved (they can stop and resume later).
 
