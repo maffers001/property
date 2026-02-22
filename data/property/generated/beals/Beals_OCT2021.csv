@@ -1,0 +1,118 @@
+,ID,Activity I D,Date Created,Item Description,Document Type,Document Number,Debit Amount,Credit Amount,Unnamed: 8,ID Check
+0,F2046ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 20, 4-6 Alhambra Road, Southsea",Invoice,324726,6.0,0.0,,EX
+1,F1946ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 19, 4-6 Alhambra Road, Southsea",Invoice,324725,6.0,0.0,,EX
+2,F1846ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 18, 4-6 Alhambra Road, Southsea",Invoice,324723,6.0,0.0,,EX
+3,F101214ALH,844892,2021-10-20 10:55:00,"Rent for period 20/09/2021 - 19/10/2021 from Mr Andrew England - Flat 10, 12-14 Alhambra Road, Southsea",,0,0.0,0.24,,RT
+4,F101214ALH,844892,2021-10-20 10:55:00,"Management Fee at 7% - Flat 10, 12-14 Alhambra Road, Southsea",Invoice,323284,0.02,0.0,,MF
+5,F101214ALH,844892,2021-10-20 10:55:00,"Rent for period 20/10/2021 - 19/11/2021 from Mr Andrew England - Flat 10, 12-14 Alhambra Road, Southsea",,0,0.0,461.28,,RT
+6,F101214ALH,844892,2021-10-20 10:55:00,"Management Fee at 7% - Flat 10, 12-14 Alhambra Road, Southsea",Invoice,323284,38.75,0.0,,MF
+7,F101214ALH,844909,2021-10-20 11:01:00,"Amount payable to Mr Mathew Tucker - Flat 10, 12-14 Alhambra Road, Southsea",Statement,245887,416.75,0.0,,PM
+8,F101214ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 10, 12-14 Alhambra Road, Southsea",Invoice,324566,6.0,0.0,,EX
+9,F141214ALH,841545,2021-10-07 12:56:00,"Rent for period 06/10/2021 - 05/11/2021 from Mr Paul McIlwraith - Flat 14, 12-14 Alhambra Road, Southsea",,0,0.0,500.0,,RT
+10,F141214ALH,841545,2021-10-07 12:56:00,"Management Fee at 7% - Flat 14, 12-14 Alhambra Road, Southsea",Invoice,321918,42.0,0.0,,MF
+11,F141214ALH,841560,2021-10-07 13:02:00,"Amount payable to Mr Mathew Tucker - Flat 14, 12-14 Alhambra Road, Southsea",Statement,244355,452.0,0.0,,PM
+12,F141214ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 14, 12-14 Alhambra Road, Southsea",Invoice,324573,6.0,0.0,,EX
+13,F41214ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 4, 12-14 Alhambra Road, Southsea",Invoice,324579,6.0,0.0,,EX
+14,F61618ALH,842573,2021-10-13 10:29:00,"Rent for period 12/10/2021 - 11/11/2021 from Mr Peter Taperek - Flat 6, 16-18 Alhambra Road, Southsea",,0,0.0,189.32,,RT
+15,F61618ALH,842573,2021-10-13 10:29:00,"Management Fee at 7% - Flat 6, 16-18 Alhambra Road, Southsea",Invoice,322481,15.9,0.0,,MF
+16,F61618ALH,842586,2021-10-13 10:39:00,"Amount payable to Mr Mathew Tucker - Flat 6, 16-18 Alhambra Road, Southsea",Statement,244675,167.42,0.0,,PM
+17,F61618ALH,844398,2021-10-19 11:54:00,"Rent for period 12/10/2021 - 11/11/2021 from Mr Peter Taperek - Flat 6, 16-18 Alhambra Road, Southsea",,0,0.0,310.68,,RT
+18,F61618ALH,844398,2021-10-19 11:54:00,"Management Fee at 7% - Flat 6, 16-18 Alhambra Road, Southsea",Invoice,323178,26.1,0.0,,MF
+19,F61618ALH,844412,2021-10-19 11:57:00,"Amount payable to Mr Mathew Tucker - Flat 6, 16-18 Alhambra Road, Southsea",Statement,245567,284.58,0.0,,PM
+20,F61618ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 6, 16-18 Alhambra Road, Southsea",Invoice,324630,6.0,0.0,,EX
+21,F111618ALH,842570,2021-10-13 10:29:00,"Rent for period 12/10/2021 - 11/11/2021 from Mr Sam Yates - Flat 11, 16-18 Alhambra Road, Southsea",,0,0.0,550.0,,RT
+22,F111618ALH,842570,2021-10-13 10:29:00,"Management Fee at 7% - Flat 11, 16-18 Alhambra Road, Southsea",Invoice,322479,46.2,0.0,,MF
+23,F111618ALH,842586,2021-10-13 10:39:00,"Amount payable to Mr Mathew Tucker - Flat 11, 16-18 Alhambra Road, Southsea",Statement,244672,497.8,0.0,,PM
+24,F111618ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 11, 16-18 Alhambra Road, Southsea",Invoice,324619,6.0,0.0,,EX
+25,F131618ALH,845955,2021-10-27 11:46:00,"Rent for period 28/10/2021 - 27/11/2021 from Mr Tomas Gamarro Garcia, Miss Agnieszka Helena Kraus - Flat 13, 16-18 Alhambra Road, Southsea",,0,0.0,550.0,,RT
+26,F131618ALH,845955,2021-10-27 11:46:00,"Management Fee at 7% - Flat 13, 16-18 Alhambra Road, Southsea",Invoice,323816,46.2,0.0,,MF
+27,F131618ALH,845964,2021-10-27 11:49:00,"Amount payable to Mr Mathew Tucker - Flat 13, 16-18 Alhambra Road, Southsea",Statement,246263,503.8,0.0,,PM
+28,F1321LON,845775,2021-10-26 12:14:00,"Rent for period 25/10/2021 - 24/11/2021 from Ms Sharon Briscoe - Flat 1, 321 London Road, Portsmouth",,0,0.0,500.0,,RT
+29,F1321LON,845775,2021-10-26 12:14:00,"Management Fee at 7% - Flat 1, 321 London Road, Portsmouth",Invoice,323719,42.0,0.0,,MF
+30,F1321LON,845793,2021-10-26 12:27:00,"Amount payable to Mr Mathew Tucker - Flat 1, 321 London Road, Portsmouth",Statement,246193,446.0,0.0,,PM
+31,F1321LON,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 1, 321 London Road, Portsmouth",Invoice,324710,12.0,0.0,,EX
+32,F4321LON,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 4, 321 London Road, Portsmouth",Invoice,324713,6.0,0.0,,EX
+33,F4321LON,846354,2021-10-29 12:43:00,"Rent for period 26/10/2021 - 25/11/2021 from Miss Carol Carrington - Flat 4, 321 London Road, Portsmouth",,0,0.0,114.72,,RT
+34,F4321LON,846354,2021-10-29 12:43:00,"Management Fee at 7% - Flat 4, 321 London Road, Portsmouth",Invoice,325011,9.64,0.0,,MF
+35,F4321LON,846358,2021-10-29 12:46:00,"Amount payable to Mr Mathew Tucker - Flat 4, 321 London Road, Portsmouth",Statement,246411,99.08,0.0,,PM
+36,F2171FAW,840818,2021-10-04 12:33:00,"Rent for period 02/10/2021 - 01/11/2021 from Mr Michael Pedace - Flat 2, 171 Fawcett Road, Southsea",,0,0.0,76.24,,RT
+37,F2171FAW,840818,2021-10-04 12:33:00,"Management Fee at 7% - Flat 2, 171 Fawcett Road, Southsea",Invoice,321532,6.41,0.0,,MF
+38,F2171FAW,840840,2021-10-04 12:39:00,"Amount payable to Mr Mathew Tucker - Flat 2, 171 Fawcett Road, Southsea",Statement,244039,63.83,0.0,,PM
+39,F2171FAW,844391,2021-10-19 11:54:00,"Rent for period 02/10/2021 - 01/11/2021 from Mr Michael Pedace - Flat 2, 171 Fawcett Road, Southsea",,0,0.0,423.76,,RT
+40,F2171FAW,844391,2021-10-19 11:54:00,"Management Fee at 7% - Flat 2, 171 Fawcett Road, Southsea",Invoice,323171,35.59,0.0,,MF
+41,F2171FAW,844412,2021-10-19 11:57:00,"Amount payable to Mr Mathew Tucker - Flat 2, 171 Fawcett Road, Southsea",Statement,245560,388.17,0.0,,PM
+42,F2171FAW,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 2, 171 Fawcett Road, Southsea",Invoice,324646,6.0,0.0,,EX
+43,F3169FAW,840823,2021-10-04 12:33:00,"Rent for period 15/09/2021 - 14/10/2021 from Mr Graham Robinson - Flat 3, 169 Fawcett Road, Southsea",,0,0.0,500.0,,RT
+44,F3169FAW,840823,2021-10-04 12:33:00,"Management Fee at 7% - Flat 3, 169 Fawcett Road, Southsea",Invoice,321537,42.0,0.0,,MF
+45,F3169FAW,840840,2021-10-04 12:39:00,"Amount payable to Mr Mathew Tucker - Flat 3, 169 Fawcett Road, Southsea",Statement,244044,452.0,0.0,,PM
+46,F3169FAW,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 3, 169 Fawcett Road, Southsea",Invoice,324641,6.0,0.0,,EX
+47,F1169FAW,844386,2021-10-19 11:54:00,"Rent for period 06/09/2021 - 05/10/2021 from Ms Susan Parkinson - Flat 1, 169 Fawcett Road, Southsea",,0,0.0,152.24,,RT
+48,F1169FAW,844386,2021-10-19 11:54:00,"Management Fee at 7% - Flat 1, 169 Fawcett Road, Southsea",Invoice,323166,12.79,0.0,,MF
+49,F1169FAW,844386,2021-10-19 11:54:00,"Rent for period 06/10/2021 - 05/11/2021 from Ms Susan Parkinson - Flat 1, 169 Fawcett Road, Southsea",,0,0.0,313.88,,RT
+50,F1169FAW,844386,2021-10-19 11:54:00,"Management Fee at 7% - Flat 1, 169 Fawcett Road, Southsea",Invoice,323166,26.36,0.0,,MF
+51,F1169FAW,844412,2021-10-19 11:57:00,"Amount payable to Mr Mathew Tucker - Flat 1, 169 Fawcett Road, Southsea",Statement,245555,420.97,0.0,,PM
+52,F1169FAW,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 1, 169 Fawcett Road, Southsea",Invoice,324640,6.0,0.0,,EX
+53,SHOP196KIN,842331,2021-10-12 11:05:00,"Rent for period 11/10/2021 - 10/11/2021 from Mr Martin Gliszczynski (SIE-SOF T/A Pol Help) - Shop, 196 Kingston Road, Portsmouth",,0,0.0,350.0,,RT
+54,SHOP196KIN,842331,2021-10-12 11:05:00,"Management Fee at 7% - Shop, 196 Kingston Road, Portsmouth",Invoice,322399,29.4,0.0,,MF
+55,SHOP196KIN,842336,2021-10-12 11:10:00,"Amount payable to Mr Mathew Tucker - Shop, 196 Kingston Road, Portsmouth",Statement,244593,314.6,0.0,,PM
+56,SHOP196KIN,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Shop, 196 Kingston Road, Portsmouth",Invoice,324661,6.0,0.0,,EX
+57,196AKIN,840645,2021-10-04 11:37:00,"Rent for period 01/10/2021 - 31/10/2021 from Ms Jo Henson - 196a Kingston Road, Portsmouth",,0,0.0,520.0,,RT
+58,196AKIN,840645,2021-10-04 11:37:00,"Management Fee at 7% - 196a Kingston Road, Portsmouth",Invoice,321386,43.68,0.0,,MF
+59,196AKIN,840840,2021-10-04 12:39:00,"Amount payable to Mr Mathew Tucker - 196a Kingston Road, Portsmouth",Statement,243882,470.32,0.0,,PM
+60,196AKIN,846027,2021-10-28 00:36:00,"Legislation & Compliance  - 196a Kingston Road, Portsmouth",Invoice,324663,6.0,0.0,,EX
+61,F68ALH,841830,2021-10-08 11:37:00,"Rent for period 08/10/2021 - 07/11/2021 from Mr Antony Raymond Hinks - Flat 6, 8 Alhambra Road, Southsea",,0,0.0,326.12,,RT
+62,F68ALH,841830,2021-10-08 11:37:00,"Management Fee at 7% - Flat 6, 8 Alhambra Road, Southsea",Invoice,322090,27.4,0.0,,MF
+63,F68ALH,841835,2021-10-08 11:39:00,"Amount payable to Mr Mathew Tucker - Flat 6, 8 Alhambra Road, Southsea",Statement,244413,292.72,0.0,,PM
+64,F68ALH,844399,2021-10-19 11:54:00,"Rent for period 08/10/2021 - 07/11/2021 from Mr Antony Raymond Hinks - Flat 6, 8 Alhambra Road, Southsea",,0,0.0,173.88,,RT
+65,F68ALH,844399,2021-10-19 11:54:00,"Management Fee at 7% - Flat 6, 8 Alhambra Road, Southsea",Invoice,323179,14.6,0.0,,MF
+66,F68ALH,844412,2021-10-19 11:57:00,"Amount payable to Mr Mathew Tucker - Flat 6, 8 Alhambra Road, Southsea",Statement,245568,159.28,0.0,,PM
+67,F68ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 6, 8 Alhambra Road, Southsea",Invoice,324769,6.0,0.0,,EX
+68,F3163FRA,844394,2021-10-19 11:54:00,"Rent for period 14/10/2021 - 13/11/2021 from Mr Martin Brett - Flat 3, 163 Fratton Road, Portsmouth",,0,0.0,450.0,,RT
+69,F3163FRA,844394,2021-10-19 11:54:00,"Management Fee at 7% - Flat 3, 163 Fratton Road, Portsmouth",Invoice,323174,37.8,0.0,,MF
+70,F3163FRA,844412,2021-10-19 11:57:00,"Amount payable to Mr Mathew Tucker - Flat 3, 163 Fratton Road, Portsmouth",Statement,245563,406.2,0.0,,PM
+71,F3163FRA,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 3, 163 Fratton Road, Portsmouth",Invoice,324632,6.0,0.0,,EX
+72,F71214ALH,844400,2021-10-19 11:54:00,"Rent for period 14/09/2021 - 13/10/2021 from Mr Aleksandra Radzevics - Flat 7, 12-14 Alhambra Road, Southsea",,0,0.0,0.72,,RT
+73,F71214ALH,844400,2021-10-19 11:54:00,"Management Fee at 7% - Flat 7, 12-14 Alhambra Road, Southsea",Invoice,323180,0.06,0.0,,MF
+74,F71214ALH,844400,2021-10-19 11:54:00,"Rent for period 14/10/2021 - 13/11/2021 from Mr Aleksandra Radzevics - Flat 7, 12-14 Alhambra Road, Southsea",,0,0.0,460.8,,RT
+75,F71214ALH,844400,2021-10-19 11:54:00,"Management Fee at 7% - Flat 7, 12-14 Alhambra Road, Southsea",Invoice,323180,38.71,0.0,,MF
+76,F71214ALH,844412,2021-10-19 11:57:00,"Amount payable to Mr Mathew Tucker - Flat 7, 12-14 Alhambra Road, Southsea",Statement,245569,416.75,0.0,,PM
+77,F71214ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 7, 12-14 Alhambra Road, Southsea",Invoice,324581,6.0,0.0,,EX
+78,F1171FAW,842092,2021-10-11 10:35:00,"Rent for period 06/09/2021 - 05/10/2021 from Ms Kirstine Aldridge - Flat 1, 171 Fawcett Road, Southsea",,0,0.0,440.0,,RT
+79,F1171FAW,842092,2021-10-11 10:35:00,"Management Fee at 7% - Flat 1, 171 Fawcett Road, Southsea",Invoice,322271,36.96,0.0,,MF
+80,F1171FAW,842092,2021-10-11 10:35:00,"Rent for period 06/10/2021 - 05/11/2021 from Ms Kirstine Aldridge - Flat 1, 171 Fawcett Road, Southsea",,0,0.0,160.0,,RT
+81,F1171FAW,842092,2021-10-11 10:35:00,"Management Fee at 7% - Flat 1, 171 Fawcett Road, Southsea",Invoice,322271,13.44,0.0,,MF
+82,F1171FAW,842102,2021-10-11 10:42:00,"Amount payable to Mr Mathew Tucker - Flat 1, 171 Fawcett Road, Southsea",Statement,244469,543.6,0.0,,PM
+83,F1171FAW,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 1, 171 Fawcett Road, Southsea",Invoice,324644,6.0,0.0,,EX
+84,F78ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 7, 8 Alhambra Road, Southsea",Invoice,324770,6.0,0.0,,EX
+85,F31214ALH,844393,2021-10-19 11:54:00,"Rent for period 18/10/2021 - 17/11/2021 from Mr Andrew Greer - Flat 3, 12-14 Alhambra Road, Southsea",,0,0.0,525.0,,RT
+86,F31214ALH,844393,2021-10-19 11:54:00,"Management Fee at 7% - Flat 3, 12-14 Alhambra Road, Southsea",Invoice,323173,44.1,0.0,,MF
+87,F31214ALH,844412,2021-10-19 11:57:00,"Amount payable to Ms Ivana Valentino - Flat 3, 12-14 Alhambra Road, Southsea",Statement,245562,474.9,0.0,,PM
+88,F31214ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 3, 12-14 Alhambra Road, Southsea",Invoice,324577,6.0,0.0,,EX
+89,F51214ALH,845490,2021-10-23 10:23:00,"Rent for period 23/10/2021 - 22/11/2021 from Mr Michael Valverde - Flat 5, 12-14 Alhambra Road, Southsea",,0,0.0,453.44,,RT
+90,F51214ALH,845490,2021-10-23 10:23:00,"Management Fee at 7% - Flat 5, 12-14 Alhambra Road, Southsea",Invoice,323558,38.09,0.0,,MF
+91,F51214ALH,845496,2021-10-23 10:31:00,"Amount payable to Ms Ivana Valentino - Flat 5, 12-14 Alhambra Road, Southsea",Statement,246093,409.35,0.0,,PM
+92,F51214ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 5, 12-14 Alhambra Road, Southsea",Invoice,324580,6.0,0.0,,EX
+93,F161214ALH,844389,2021-10-19 11:54:00,"Rent for period 19/09/2021 - 18/10/2021 from Mr Aubrey Milligan - Flat 16, 12-14 Alhambra Road, Southsea",,0,0.0,270.8,,RT
+94,F161214ALH,844389,2021-10-19 11:54:00,"Management Fee at 6% - Flat 16, 12-14 Alhambra Road, Southsea",Invoice,323169,19.5,0.0,,MF
+95,F161214ALH,844389,2021-10-19 11:54:00,"Rent for period 19/10/2021 - 18/11/2021 from Mr Aubrey Milligan - Flat 16, 12-14 Alhambra Road, Southsea",,0,0.0,190.72,,RT
+96,F161214ALH,844389,2021-10-19 11:54:00,"Management Fee at 6% - Flat 16, 12-14 Alhambra Road, Southsea",Invoice,323169,13.73,0.0,,MF
+97,F161214ALH,844412,2021-10-19 11:57:00,"Amount payable to Ms Ivana Valentino - Flat 16, 12-14 Alhambra Road, Southsea",Statement,245558,422.29,0.0,,PM
+98,F161214ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 16, 12-14 Alhambra Road, Southsea",Invoice,324576,6.0,0.0,,EX
+99,F121618ALH,844387,2021-10-19 11:54:00,"Rent for period 19/10/2021 - 18/11/2021 from Mr Jason Passmore - Flat 12, 16-18 Alhambra Road, Southsea",,0,0.0,505.0,,RT
+100,F121618ALH,844387,2021-10-19 11:54:00,"Management Fee at 7% - Flat 12, 16-18 Alhambra Road, Southsea",Invoice,323167,42.42,0.0,,MF
+101,F121618ALH,844412,2021-10-19 11:57:00,"Amount payable to Ms Ivana Valentino - Flat 12, 16-18 Alhambra Road, Southsea",Statement,245556,456.58,0.0,,PM
+102,F121618ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 12, 16-18 Alhambra Road, Southsea",Invoice,324620,6.0,0.0,,EX
+103,F161618ALH,840817,2021-10-04 12:33:00,"Rent for period 28/08/2021 - 27/09/2021 from Mr Peter Gradon - Flat 16, 16-18 Alhambra Road, Southsea",,0,0.0,525.0,,RT
+104,F161618ALH,840817,2021-10-04 12:33:00,"Management Fee at 7% - Flat 16, 16-18 Alhambra Road, Southsea",Invoice,321531,44.1,0.0,,MF
+105,F161618ALH,840817,2021-10-04 12:33:00,"Rent for period 28/09/2021 - 27/10/2021 from Mr Peter Gradon - Flat 16, 16-18 Alhambra Road, Southsea",,0,0.0,525.0,,RT
+106,F161618ALH,840817,2021-10-04 12:33:00,"Management Fee at 7% - Flat 16, 16-18 Alhambra Road, Southsea",Invoice,321531,44.1,0.0,,MF
+107,F161618ALH,840817,2021-10-04 12:33:00,"Rent for period 28/10/2021 - 27/11/2021 from Mr Peter Gradon - Flat 16, 16-18 Alhambra Road, Southsea",,0,0.0,525.0,,RT
+108,F161618ALH,840817,2021-10-04 12:33:00,"Management Fee at 7% - Flat 16, 16-18 Alhambra Road, Southsea",Invoice,321531,44.1,0.0,,MF
+109,F161618ALH,840817,2021-10-04 12:33:00,"Rent for period 28/11/2021 - 27/12/2021 from Mr Peter Gradon - Flat 16, 16-18 Alhambra Road, Southsea",,0,0.0,525.0,,RT
+110,F161618ALH,840817,2021-10-04 12:33:00,"Management Fee at 7% - Flat 16, 16-18 Alhambra Road, Southsea",Invoice,321531,44.1,0.0,,MF
+111,F161618ALH,840817,2021-10-04 12:33:00,"Rent for period 28/12/2021 - 27/01/2022 from Mr Peter Gradon - Flat 16, 16-18 Alhambra Road, Southsea",,0,0.0,525.0,,RT
+112,F161618ALH,840817,2021-10-04 12:33:00,"Management Fee at 7% - Flat 16, 16-18 Alhambra Road, Southsea",Invoice,321531,44.1,0.0,,MF
+113,F161618ALH,840817,2021-10-04 12:33:00,"Rent for period 28/01/2022 - 27/02/2022 from Mr Peter Gradon - Flat 16, 16-18 Alhambra Road, Southsea",,0,0.0,525.0,,RT
+114,F161618ALH,840817,2021-10-04 12:33:00,"Management Fee at 7% - Flat 16, 16-18 Alhambra Road, Southsea",Invoice,321531,44.1,0.0,,MF
+115,F161618ALH,840840,2021-10-04 12:39:00,"Amount payable to Ms Ivana Valentino - Flat 16, 16-18 Alhambra Road, Southsea",Statement,244038,2843.4,0.0,,PM
+116,F161618ALH,846027,2021-10-28 00:36:00,"Legislation & Compliance  - Flat 16, 16-18 Alhambra Road, Southsea",Invoice,324622,6.0,0.0,,EX

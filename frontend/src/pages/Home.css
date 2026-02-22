@@ -1,0 +1,64 @@
+.home h1 {
+  margin: 0 0 1rem;
+  font-size: 1.5rem;
+}
+
+.home-section {
+  margin-bottom: 1rem;
+}
+
+.home-section label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.home-section select {
+  width: 100%;
+  max-width: 200px;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.home-btn {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.home-btn-primary {
+  background: #3d3d6b;
+  color: #eee;
+}
+
+.home-btn-primary:hover {
+  background: #4d4d7b;
+}
+
+.home-btn-secondary {
+  background: #333;
+  color: #eee;
+  border: 1px solid #555;
+}
+
+.home-btn-secondary:hover {
+  background: #444;
+}
+
+.home-loading,
+.home-error {
+  margin: 1rem 0;
+}
+
+.home-error {
+  color: #e88;
+}

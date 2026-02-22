@@ -1,0 +1,8 @@
+services:
+  pipeline:
+    build: .
+    volumes:
+      - ./data/property:/app/data/property
+    environment:
+      - DB_PATH=/app/data/property/labels.db
+      - DATA_PATH=/app/data/property

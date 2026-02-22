@@ -1,0 +1,37 @@
+.settings-page h1 {
+  margin-top: 0;
+}
+
+.settings-message {
+  color: #6a6;
+  margin: 0.5rem 0;
+}
+
+.settings-section {
+  margin-top: 1.5rem;
+}
+
+.settings-section h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.settings-section form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.settings-section input {
+  padding: 0.5rem;
+  min-width: 200px;
+}
+
+.settings-section button {
+  padding: 0.5rem 1rem;
+  background: #3d3d6b;
+  color: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

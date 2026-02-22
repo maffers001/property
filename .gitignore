@@ -1,5 +1,5 @@
 # Exclude data folder (bank downloads, generated/checked files)
-/data/
+#/data/
 
 # Optional: common Python/notebook artifacts
 .ipynb_checkpoints/
