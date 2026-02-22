@@ -1,0 +1,354 @@
+Date,Account,Amount,Subcategory,Memo,Property,Description,Cat,Subcat
+2022-06-01,20-74-09 60458872,50.0,Card Purchase,HARRODS               	ON 31 MAY BCC,,,PersonalExpense,Beauty
+2022-06-01,20-74-09 40406538,-9.75,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 31 MAY CLP,,,PersonalExpense,COOP
+2022-06-01,20-53-97 30728691,675.0,Funds Transfer,FURCZYK Z K           	RENTJUNE FT,F88ALH,"Rent for period 30/05/2022 - 29/06/2022 from Miss Zofia Furczyk - Flat 8, 8 Alhambra Road, Southsea",OurRent,
+2022-06-01,20-74-09 60458872,-50.0,Card Purchase,HARRODS               	ON 31 MAY BCC,,,PersonalExpense,Beauty
+2022-06-01,20-74-09 40406538,-33.94,Card Purchase,Zara.com              	ON 31 MAY BCC,,,PersonalExpense,Clothing
+2022-06-01,20-53-97 30728691,1200.0,Standing Order,TUCKER MS %0 P        	20533030728691 STO,,,Funds3072,
+2022-06-01,20-53-97 30728691,-50.0,Standing Order,NATIONWIDE            	0604/229172770 STO,,,RegularPayment,
+2022-06-01,20-74-09 40406538,-33.94,Card Purchase,Zara.com              	ON 31 MAY BCC,,,PersonalExpense,Clothing
+2022-06-01,20-74-09 60458872,-1200.0,Standing Order,MR MATTHEW STUART     	20533030728691 STO,,,Funds3072,
+2022-06-01,20-74-09 60458872,-5.0,Standing Order,M TUCKER              	MTUCKER STO,,,RegularPayment,
+2022-06-01,20-53-97 30728691,-50.0,Standing Order,23 HAMPSHIRE TERRA    	209254 13676978 STO,,,ServiceCharge,
+2022-06-06,20-74-09 40406538,-41.34,Contactless Card Purchase,TESCO STORE 2547      	ON 05 JUN CLP,,,PersonalExpense,Tesco
+2022-06-01,20-53-97 30728691,-160.0,Standing Order,ALHAMBRA ROAD MANA    	209254 13686035 STO,,,ServiceCharge,
+2022-06-01,20-74-09 60458872,-50.0,Standing Order,M TUCKER              	M TUCKER STO,,,RegularPayment,
+2022-06-06,20-74-09 40406538,-53.67,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 05 JUN CLP,,,PersonalExpense,M&S
+2022-06-01,20-53-97 30728691,-157.5,Standing Order,ALHAMBRA ROAD MANA    	209254 23534332 STO,,,ServiceCharge,
+2022-06-01,20-74-09 60458872,-50.0,Standing Order,23 HAMPSHIRE TERRA    	209254 13676978 STO,,,ServiceCharge,
+2022-06-06,20-74-09 40406538,-49.08,Card Purchase,ZARA                  	ON 05 JUN BCC,,,PersonalExpense,Clothing
+2022-06-06,20-74-09 40406538,-4.29,Contactless Card Purchase,MILTON KEYNES FOOD    	ON 04 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-01,20-74-09 60458872,-160.0,Standing Order,16-18 ALHAMBRA RD     	209254 13686035 STO,,,ServiceCharge,
+2022-06-01,20-53-97 30728691,-232.5,Standing Order,ALHAMBRA ROAD MANA    	209254 83672832 STO,,,ServiceCharge,
+2022-06-06,20-74-09 40406538,-24.74,Contactless Card Purchase,ASDA STORES           	ON 04 JUN CLP,,,PersonalExpense,ASDA
+2022-06-01,20-74-09 60458872,-157.5,Standing Order,12-14 ALHAMBRA RD     	209254 23534332 STO,,,ServiceCharge,
+2022-06-01,20-53-97 30728691,-241.06,Direct Debit,PLATFORM FUNDING      	01050229961090 DDR,F2246ALH,,Mortgage,
+2022-06-06,20-74-09 40406538,-8.0,Contactless Card Purchase,SumUp *Jersey whip    	ON 01 JUN CLP,,,PersonalExpense,Other
+2022-06-01,20-53-97 30728691,-243.02,Direct Debit,PLATFORM FUNDING      	01050228964703 DDR,F2346ALH,,Mortgage,
+2022-06-01,20-74-09 60458872,-232.5,Standing Order,4-6 ALHAMBRA RD CS    	209254 83672832 STO,,,ServiceCharge,
+2022-06-01,20-74-09 60458872,-126.64,Direct Debit,CHL HOME LOAN         	CHL00002/907372200 DD,F2169FAW,,Mortgage,
+2022-06-01,20-53-97 30728691,-390.64,Direct Debit,TOPAZ RE SIBERITE     	SIB00001/480016104 DD,F2146ALH,,Mortgage,
+2022-06-06,20-74-09 40406538,-15.3,Contactless Card Purchase,BP NEWHAM AVENUE C    	ON 31 MAY CLP,,,PersonalExpense,Garage
+2022-06-01,20-53-97 30728691,-584.79,Direct Debit,NRAM                  	NRD00001/631516204 DD,23CHAM,,Mortgage,
+2022-06-01,20-74-09 60458872,-127.39,Direct Debit,CHL HOME LOAN         	CHL00002/907371904 DD,F3321LON,,Mortgage,
+2022-06-07,20-74-09 40406538,-10.0,Cash Withdrawal,POST OFFICE           33 COTTON END	07JUN 14,,,PersonalExpense,Cash
+2022-06-01,20-53-97 30728691,-228.55,Direct Debit,TOPAZ FIN JASPER      	PRU00010/190859005 DD,F31618ALH,,Mortgage,
+2022-06-01,20-74-09 60458872,-28.45,Direct Debit,PIC RE ARGOS PET      	PETAG934657920001 DDR,,,RegularPayment,
+2022-06-08,20-74-09 40406538,-6.65,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 07 JUN CLP,,,PersonalExpense,COOP
+2022-06-01,20-53-97 30728691,-1509.66,Direct Debit,THE HARPUR TRUST D    	BVAL000 DDR,,,SchoolFee,
+2022-06-01,20-74-09 60458872,-222.52,Direct Debit,PLATFORM FUNDING      	01050230313307 DDR,F61618ALH,,Mortgage,
+2022-06-09,20-74-09 40406538,-31.74,Contactless Card Purchase,TESCO STORE 2105      	ON 08 JUN CLP,,,PersonalExpense,Tesco
+2022-06-09,20-74-09 40406538,-4.7,Contactless Card Purchase,COSTA COFFEE 43035    	ON 08 JUN CLP,,,PersonalExpense,Coffee
+2022-06-01,20-53-97 30728691,-2329.0,Direct Debit,THE HARPUR TRUST D    	TUCKM8 BVALR8 DDR,,,SchoolFee,
+2022-06-01,20-74-09 60458872,-241.47,Direct Debit,PLATFORM FUNDING      	01050229961082 DDR,F2046ALH,,Mortgage,
+2022-06-01,20-53-97 30728691,-1663.8,Direct Debit,THE HARPUR TRUST D    	GVALS1 DDR,,,SchoolFee,
+2022-06-06,20-74-09 60458872,-11.99,Card Purchase,NOW 839F5 Sports D    	ON 05 JUN BCC,,,PersonalExpense,Amazon
+2022-06-09,20-74-09 40406538,-9.05,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 08 JUN CLP,,,PersonalExpense,COOP
+2022-06-06,20-53-97 30728691,196.16,Counter Credit,BEALS ESTATE AGENT    	FLAT 312-14 ALHAMB BG,F31214ALH,,BealsRent,
+2022-06-06,20-74-09 60458872,-77.5,Card Purchase,HARRODS BEAUTY LTD    	ON 05 JUN BCC,,,PersonalExpense,Beauty
+2022-06-09,20-74-09 40406538,-6.76,Contactless Card Purchase,BUDGENS               	ON 08 JUN CLP,,,PersonalExpense,Budgens
+2022-06-09,20-74-09 40406538,-2.78,Contactless Card Purchase,BUDGENS               	ON 08 JUN CLP,,,PersonalExpense,Budgens
+2022-06-06,20-53-97 30728691,328.84,Counter Credit,BEALS ESTATE AGENT    	FLAT 312-14 ALHAMB BG,F31214ALH,,BealsRent,
+2022-06-06,20-74-09 60458872,276.64,Counter Credit,BEALS ESTATE AGENT    	FLAT 712-14 ALHAMB BG,F71214ALH,,BealsRent,
+2022-06-06,20-74-09 60458872,418.36,Counter Credit,BEALS ESTATE AGENT    	FLAT 1169 FAWCETT BGC,F1169FAW,,BealsRent,
+2022-06-06,20-53-97 30728691,422.3,Counter Credit,BEALS ESTATE AGENT    	FLAT 1612-14 ALHAM BG,F161214ALH,,BealsRent,
+2022-06-09,20-74-09 40406538,-30.65,Contactless Card Purchase,BP NEWHAM AVENUE C    	ON 07 JUN CLP,,,PersonalExpense,Garage
+2022-06-09,20-74-09 40406538,-8.0,Direct Debit,ID MOBILE LIMITED     	12253154/001 DDR,,,RegularPayment,
+2022-06-06,20-53-97 30728691,269.1,Counter Credit,BEALS ESTATE AGENT    	FLAT 512-14 ALHAMB BG,F51214ALH,,BealsRent,
+2022-06-06,20-74-09 60458872,215.12,Counter Credit,BEALS ESTATE AGENT    	FLAT 3163 FRATTON BGC,F3163FRA,,BealsRent,
+2022-06-10,20-74-09 40406538,-19.06,Contactless Card Purchase,MCDONALDS             	ON 08 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-06,20-74-09 60458872,206.15,Counter Credit,BEALS ESTATE AGENT    	FLAT 2171 FAWCETT BGC,F2171FAW,,BealsRent,
+2022-06-06,20-53-97 30728691,207.42,Counter Credit,BEALS ESTATE AGENT    	FLAT 1216-18 ALHAM BG,F121618ALH,,BealsRent,
+2022-06-06,20-74-09 60458872,102.56,Counter Credit,BEALS ESTATE AGENT    	FLAT 616-18 ALHAMB BG,F61618ALH,,BealsRent,
+2022-06-06,20-53-97 30728691,-75.0,Standing Order,KINGSTON UNITY        	PL684048A VALENTNO ST,,,RegularPayment,
+2022-06-10,20-74-09 40406538,-36.45,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 09 JUN CLP,,,PersonalExpense,M&S
+2022-06-06,20-74-09 60458872,276.2,Counter Credit,BEALS ESTATE AGENT    	FLAT 1012-14 ALHAM BG,F101214ALH,,BealsRent,
+2022-06-06,20-53-97 30728691,-75.0,Direct Debit,SHEPHERDS FRIENDLY    	PN026484A DDR,,,RegularPayment,
+2022-06-10,20-74-09 40406538,-5.52,Contactless Card Purchase,LIDL GB BEDFORD       	ON 09 JUN CLP,,,PersonalExpense,LIDL
+2022-06-06,20-53-97 30728691,-280.92,Direct Debit,TOPAZ FIN JASPER      	PRU00010/191462710 DD,F3171FAW,,Mortgage,
+2022-06-10,20-74-09 40406538,-2.85,Contactless Card Purchase,COSTA COFFEE 43035    	ON 09 JUN CLP,,,PersonalExpense,Coffee
+2022-06-06,20-74-09 60458872,-300.0,Standing Order,G & F VALENTINO       	M TUCKER STO,,,Hilltop,
+2022-06-06,20-53-97 30728691,-37.95,Direct Debit,L&G INSURANCE MI      	0114399215-220606 DDR,,,RegularPayment,
+2022-06-06,20-74-09 60458872,-231.14,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/137376104 DD,F2171FAW,,Mortgage,
+2022-06-10,20-74-09 40406538,-4.95,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 08 JUN CLP,,,PersonalExpense,Garage
+2022-06-06,20-53-97 30728691,850.0,Counter Credit,DANIELLE FULKER       	171 flat 3 rent BGC,F3171FAW,"Rent for period 01/06/2022 - 30/07/2022 from Mr Lachezar Nikolav and Miss Daniella Fulker - Flat 3, 171 Fawcett Rd",OurRent,
+2022-06-10,20-74-09 40406538,-98.97,Card Purchase,WM MORRISONS PETRO    	ON 09 JUN BCC,,,PersonalExpense,Garage
+2022-06-06,20-74-09 60458872,-261.28,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/137376006 DD,F1171FAW,,Mortgage,
+2022-06-06,20-53-97 30728691,775.0,Counter Credit,M Doyle               	23B HAMPSHIRE TER. BG,23BHAM,Rent for period 04/06/2022 - 03/07/2022 from Mr Marut Doyle and Miss Thunyakan Chewwaiyaphat - 23B Hampshire Terrace,OurRent,
+2022-06-10,20-74-09 40406538,-160.0,Cash Withdrawal,LINK                  82 KIMBOLTON ROAD	10JU,,,PersonalExpense,Cash
+2022-06-06,20-74-09 60458872,-288.4,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/134467209 DD,F141214ALH,,Mortgage,
+2022-06-07,20-53-97 30728691,-372.5,Direct Debit,SKIPTON B.S.          	SBS00001/165905969 DD,F88ALH,,Mortgage,
+2022-06-13,20-74-09 40406538,-16.05,Contactless Card Purchase,MCDONALDS             	ON 12 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-06,20-74-09 60458872,-278.43,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/134338410 DD,F131618ALH,,Mortgage,
+2022-06-08,20-53-97 30728691,-690.0,Card Purchase,WWW.TDS.GB.COM        	ON 07 JUN BCC,F4163FRA,Deposit Natso,Deposit,
+2022-06-06,20-74-09 60458872,-228.66,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/134333009 DD,F111618ALH,,Mortgage,
+2022-06-13,20-74-09 40406538,-5.0,Card Purchase,THE SWAN HOTEL CAR    	ON 12 JUN BCC,,,PersonalExpense,Other
+2022-06-08,20-53-97 30728691,452.0,Counter Credit,BEALS ESTATE AGENT    	FLAT 78 ALHAMBRA R BG,F78ALH,,BealsRent,
+2022-06-06,20-74-09 60458872,-278.23,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/134332909 DD,F11618ALH,,Mortgage,
+2022-06-13,20-74-09 40406538,-30.0,Contactless Card Purchase,NANDOS BEDFORD        	ON 11 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-08,20-53-97 30728691,-267.05,Direct Debit,BHAM MIDSHIRES        	6092076502030000 DDR,196BKIN,,Mortgage,
+2022-06-06,20-74-09 60458872,-228.53,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/134121904 DD,F111214ALH,,Mortgage,
+2022-06-13,20-74-09 40406538,-15.1,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 11 JUN CLP,,,PersonalExpense,COOP
+2022-06-08,20-53-97 30728691,3860.0,Counter Credit,F3 12-14 ALHAMBRA     	SEQUENCE UK LIMI BGC,F31214ALH,"Rent for period 23/05/2022 - 22/11/2022 from Mr Jason Moore - Flat 3, 12-14 Alhambra Road",OurRent,
+2022-06-13,20-74-09 40406538,-6.25,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 10 JUN CLP,,,PersonalExpense,Garage
+2022-06-06,20-74-09 60458872,-176.26,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/132514207 DD,F1169FAW,,Mortgage,
+2022-06-13,20-74-09 40406538,-1.48,Contactless Card Purchase,BUDGENS               	ON 10 JUN CLP,,,PersonalExpense,Budgens
+2022-06-13,20-53-97 30728691,600.0,Counter Credit,Barber Bria           	DEPOSIT BGC,F31618ALH,"Rent for period 15/06/2022 - 14/07/2022 from Miss Bria Barber and Mr Shawn Griffiths - Flat 3, 16-18 Alhambra Road, Southsea",OurRent,
+2022-06-06,20-74-09 60458872,-195.64,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/131992707 DD,F1321LON,,Mortgage,
+2022-06-13,20-74-09 40406538,-7.75,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 09 JUN CLP,,,PersonalExpense,Garage
+2022-06-06,20-74-09 60458872,-195.68,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/131188407 DD,F4321LON,,Mortgage,
+2022-06-13,20-53-97 30728691,-37.68,Direct Debit,AVIVA LIFE            	014033997 DDR,,,RegularPayment,
+2022-06-06,20-74-09 60458872,-178.6,Direct Debit,TOPAZ FIN ROSINCA     	BLA00010/130654303 DD,F3163FRA,,Mortgage,
+2022-06-13,20-74-09 40406538,600.0,Funds Transfer,205397 30728691       	TRF FT,,,Funds3072,
+2022-06-13,20-53-97 30728691,-600.0,Funds Transfer,207409 40406538       	TRF FT,,,Funds4040,
+2022-06-13,20-74-09 40406538,600.0,Funds Transfer,207409 60458872       	TRF FT,,,Funds6045,
+2022-06-06,20-74-09 60458872,-63.41,Contactless Card Purchase,NEW COUNTY SERVICE    	ON 04 JUN CLP,,,PersonalExpense,Garage
+2022-06-14,20-53-97 30728691,256.5,Counter Credit,C Downing             	Outstanding rent BGC,F2246ALH,"Rent for period 30/06/2022 - 30/07/2022 from Mr Cole Downing and Miss Alice Jackman - Flat 22, 4-6 Alhambra Rd",OurRent,
+2022-06-14,20-53-97 30728691,-61.65,Direct Debit,BT GROUP PLC          	GB14092007-000093 DDR,,,RegularPayment,
+2022-06-14,20-74-09 40406538,-32.81,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 13 JUN CLP,,,PersonalExpense,M&S
+2022-06-06,20-74-09 60458872,-3.85,Contactless Card Purchase,GREGGS MILTON KEYN    	ON 04 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-15,20-53-97 30728691,700.0,Funds Transfer,MARIA C               	RENT FLAT 23 4-6 FT,F2346ALH,"Rent for period 15/06/2022 - 14/07/2022 from Miss Andreea Maria and Mr Cosmin Maria - Flat 23, 4-6 Alhambra Road, Southsea",OurRent,
+2022-06-14,20-74-09 40406538,-6.0,Contactless Card Purchase,Mrs Whippy            	ON 13 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-06,20-74-09 60458872,-58.23,Contactless Card Purchase,CHICKEN GEORGE        	ON 04 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-14,20-74-09 40406538,-4.95,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 12 JUN CLP,,,PersonalExpense,Garage
+2022-06-15,20-53-97 30728691,-228.5,Direct Debit,TOPAZ FIN JASPER      	PRU00010/190959705 DD,F121618ALH,,Mortgage,
+2022-06-06,20-74-09 60458872,-9.55,Contactless Card Purchase,BP NEWHAM AVENUE C    	ON 03 JUN CLP,,,PersonalExpense,Garage
+2022-06-15,20-74-09 40406538,-5.75,Contactless Card Purchase,WILKO RETAIL LIMIT    	ON 14 JUN CLP,,,PersonalExpense,Houshold
+2022-06-06,20-74-09 60458872,-1.95,Contactless Card Purchase,BP NEWHAM AVENUE C    	ON 03 JUN CLP,,,PersonalExpense,Garage
+2022-06-15,20-53-97 30728691,-236.47,Direct Debit,TOPAZ FIN JASPER      	PRU00010/190892600 DD,F161618ALH,,Mortgage,
+2022-06-15,20-53-97 30728691,-236.47,Direct Debit,TOPAZ FIN JASPER      	PRU00010/190885203 DD,F161214ALH,,Mortgage,
+2022-06-15,20-74-09 40406538,-19.04,Contactless Card Purchase,MCDONALDS             	ON 14 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-06,20-74-09 60458872,-1.2,Contactless Card Purchase,BP NEWHAM AVENUE C    	ON 03 JUN CLP,,,PersonalExpense,Garage
+2022-06-15,20-53-97 30728691,-228.54,Direct Debit,TOPAZ FIN JASPER      	PRU00010/190885105 DD,F101214ALH,,Mortgage,
+2022-06-15,20-74-09 40406538,-52.25,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 14 JUN CLP,,,PersonalExpense,M&S
+2022-06-06,20-74-09 60458872,-6.28,Contactless Card Purchase,ASDA STORES           	ON 04 JUN CLP,,,PersonalExpense,ASDA
+2022-06-15,20-53-97 30728691,-228.5,Direct Debit,TOPAZ FIN JASPER      	PRU00010/190859506 DD,F71618ALH,,Mortgage,
+2022-06-15,20-74-09 40406538,-8.9,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 13 JUN CLP,,,PersonalExpense,Garage
+2022-06-06,20-74-09 60458872,-53.94,Card Purchase,Zara.com              	ON 04 JUN BCC,,,PersonalExpense,Clothing
+2022-06-06,20-74-09 60458872,-10.0,Card Purchase,Microsoft*Store       	ON 04 JUN BCC,,,PersonalExpense,Amazon
+2022-06-15,20-74-09 40406538,-14.08,Contactless Card Purchase,B&M 494 - HS BEDFO    	ON 14 JUN CLP,,,PersonalExpense,Houshold
+2022-06-15,20-53-97 30728691,-228.58,Direct Debit,TOPAZ FIN JASPER      	PRU00010/190812705 DD,F31214ALH,,Mortgage,
+2022-06-15,20-53-97 30728691,-228.53,Direct Debit,TOPAZ FIN JASPER      	PRU00010/190778206 DD,F51214ALH,,Mortgage,
+2022-06-06,20-74-09 60458872,-25.99,Contactless Card Purchase,WILKO RETAIL LIMIT    	ON 03 JUN CLP,,,PersonalExpense,Houshold
+2022-06-16,20-74-09 40406538,-3.0,Contactless Card Purchase,W M MORRISON PETRO    	ON 15 JUN CLP,,,PersonalExpense,Morrisons
+2022-06-15,20-53-97 30728691,-223.66,Direct Debit,PLATFORM FUNDING      	01050228957685 DDR,F78ALH,,Mortgage,
+2022-06-16,20-74-09 40406538,-2.6,Contactless Card Purchase,W M MORRISON PETRO    	ON 15 JUN CLP,,,PersonalExpense,Morrisons
+2022-06-06,20-74-09 60458872,-17.58,Contactless Card Purchase,WILKO RETAIL LIMIT    	ON 03 JUN CLP,,,PersonalExpense,Houshold
+2022-06-16,20-53-97 30728691,-300.0,Funds Transfer,207409 40406538       	TFR FT,,,Funds4040,
+2022-06-16,20-74-09 40406538,-53.85,Contactless Card Purchase,TESCO STORE 2547      	ON 15 JUN CLP,,,PersonalExpense,Tesco
+2022-06-06,20-74-09 60458872,-28.75,Contactless Card Purchase,SAINSBURY'S S/MKT     	ON 03 JUN CLP,,,PersonalExpense,Sainsburys
+2022-06-17,20-53-97 30728691,750.0,Counter Credit,JACKSON H             	7 ALHAMBRA BGC,F71618ALH,"Rent for period 17/06/2022 - 16/07/2022 from Miss Amy Jackson - Flat 7, 16-18 Alhambra Road, Southsea",OurRent,
+2022-06-06,20-74-09 60458872,-52.1,Contactless Card Purchase,NEXT RETAIL LTD       	ON 03 JUN CLP,,,PersonalExpense,Clothing
+2022-06-16,20-74-09 40406538,-15.1,Contactless Card Purchase,TESCO STORE 2547      	ON 15 JUN CLP,,,PersonalExpense,Tesco
+2022-06-06,20-74-09 60458872,-21.45,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 03 JUN CLP,,,PersonalExpense,M&S
+2022-06-20,20-53-97 30728691,-5.79,Bill Payment,P TAPEREK             	OVEN DIALS 312-14 BBP,F31214ALH,Oven Dials,PropertyExpense,
+2022-06-16,20-74-09 40406538,-40.1,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 15 JUN CLP,,,PersonalExpense,M&S
+2022-06-06,20-74-09 60458872,-12.15,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 02 JUN CLP,,,PersonalExpense,Garage
+2022-06-20,20-53-97 30728691,-4.75,Bill Payment,P TAPEREK             	3 12-14 WM CONNECT BB,F31214ALH,Wm Connect,PropertyExpense,
+2022-06-16,20-74-09 40406538,-16.35,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 14 JUN CLP,,,PersonalExpense,Garage
+2022-06-20,20-53-97 30728691,-36.88,Direct Debit,ONE CALL INS SERVS    	OIP-5-3104389 DDR,,,RegularPayment,
+2022-06-06,20-74-09 60458872,-84.0,Card Purchase,SP OH POLLY           	ON 03 JUN BCC,,,PersonalExpense,Clothing
+2022-06-16,20-74-09 40406538,-98.78,Card Purchase,WM MORRISONS PETRO    	ON 15 JUN BCC,,,PersonalExpense,Garage
+2022-06-16,20-74-09 40406538,300.0,Funds Transfer,207409 60458872       	TRF FT,,,Funds6045,
+2022-06-21,20-53-97 30728691,625.0,Counter Credit,STUKAS G              	FLAT 21 RENT BGC,F2146ALH,"Rent for period 22/06/2022 - 21/07/2022 from Mr G Stukas - Flat 21, 4-6 Alhambra Road",OurRent,
+2022-06-06,20-74-09 60458872,-100.0,Cash Withdrawal,CARDTRONICS UK LTD    NEWNHAM AVENUE	03JUN 1,,,PersonalExpense,Cash
+2022-06-06,20-74-09 60458872,725.0,Counter Credit,A Ibiyemi             	RENT 3 321 LONDON BGC,F3321LON,"Rent for period 01/06/2022 - 30/07/2022 from Mrs Adebusola Ibiyemi - Flat 3, 321 London Road",OurRent,
+2022-06-22,20-53-97 30728691,-300.0,Funds Transfer,207409 40406538       	TRF FT,,,Funds4040,
+2022-06-16,20-74-09 40406538,300.0,Funds Transfer,205397 30728691       	TFR FT,,,Funds3072,
+2022-06-22,20-53-97 30728691,-10.0,Direct Debit,ID MOBILE LIMITED     	11245718/001 DDR,,,RegularPayment,
+2022-06-16,20-74-09 40406538,-40.0,Bill Payment,ROCCO VALENTINO       	QUIZLET BBP,,,PersonalExpense,Other
+2022-06-06,20-74-09 60458872,-8.1,Contactless Card Purchase,COSTA COFFEE 43035    	ON 02 JUN CLP,,,PersonalExpense,Coffee
+2022-06-23,20-53-97 30728691,213.59,Counter Credit,BEALS ESTATE AGENT    	FLAT 1216-18 ALHAM BG,F121618ALH,,BealsRent,
+2022-06-17,20-74-09 40406538,-16.3,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 15 JUN CLP,,,PersonalExpense,Garage
+2022-06-06,20-74-09 60458872,-5.22,Contactless Card Purchase,BUDGENS               	ON 02 JUN CLP,,,PersonalExpense,Budgens
+2022-06-06,20-74-09 60458872,-10.05,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 01 JUN CLP,,,PersonalExpense,Garage
+2022-06-17,20-74-09 40406538,-5.0,Card Purchase,THE SWAN HOTEL CAR    	ON 16 JUN BCC,,,PersonalExpense,Other
+2022-06-23,20-53-97 30728691,-10.0,Direct Debit,ID MOBILE LIMITED     	11888885/001 DDR,,,RegularPayment,
+2022-06-06,20-74-09 60458872,-129.91,Card Purchase,TESCO STORE 2105      	ON 02 JUN BCC,,,PersonalExpense,Tesco
+2022-06-17,20-74-09 40406538,-116.3,Card Purchase,NANDOS BEDFORD        	ON 16 JUN BCC,,,PersonalExpense,EatingOut
+2022-06-27,20-53-97 30728691,600.0,Standing Order,MR MICHAEL BETTS      	FT11 12-14ALHAMBRA ST,F111214ALH,"Rent for period 25/06/2022 - 24/07/2022 from Mr Michael Betts - Flat 11, 12-14 Alhambra Road, Southsea",OurRent,
+2022-06-20,20-74-09 40406538,25.89,Contactless Card Refund,ZARA                  	ON 19 JUN CLR,,,PersonalExpense,Clothing
+2022-06-27,20-53-97 30728691,139.23,Counter Credit,BEALS ESTATE AGENT    	FLAT 512-14 ALHAMB BG,F51214ALH,,BealsRent,
+2022-06-06,20-74-09 60458872,-2.5,Card Purchase,MILTON_KEYNES_PARK    	ON 01 JUN BCC,,,PersonalExpense,Coffee
+2022-06-27,20-53-97 30728691,-1200.0,Standing Order,MR MATTHEW STUART     	207409 40406538 STO,,,Funds4040,
+2022-06-06,20-74-09 60458872,-88.4,Contactless Card Purchase,THE HUB DENTAL PRA    	ON 01 JUN CLP,,,PersonalExpense,Pharmacy/Opticians/Dental
+2022-06-20,20-74-09 40406538,-57.1,Contactless Card Purchase,NEXT RETAIL LTD       	ON 19 JUN CLP,,,PersonalExpense,Clothing
+2022-06-27,20-53-97 30728691,775.0,Counter Credit,N Raja Mohammad       	RENT FOR 23C BGC,23CHAM,Rent for period 30/06/2022 - 29/07/2022 from Mr Raja Numanunnain and Miss Hortenzia Kulcsar - 23C Hampshire Terrace,OurRent,
+2022-06-20,20-74-09 40406538,-61.39,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 19 JUN CLP,,,PersonalExpense,M&S
+2022-06-06,20-74-09 60458872,-26.11,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 01 JUN CLP,,,PersonalExpense,M&S
+2022-06-06,20-74-09 60458872,-36.66,Contactless Card Purchase,LIDL GB BEDFORD       	ON 01 JUN CLP,,,PersonalExpense,LIDL
+2022-06-27,20-53-97 30728691,-24.04,Direct Debit,H3G                   	980404269602230622 DD,,,RegularPayment,
+2022-06-20,20-74-09 40406538,-64.5,Contactless Card Purchase,JOHN LEWIS            	ON 19 JUN CLP,,,PersonalExpense,Houshold
+2022-06-20,20-74-09 40406538,-13.0,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 19 JUN CLP,,,PersonalExpense,COOP
+2022-06-28,20-53-97 30728691,-33.0,Direct Debit,BOOTS REWARDSCHEME    	A45028400000736 DDR,,,RegularPayment,
+2022-06-06,20-74-09 60458872,-2.85,Contactless Card Purchase,COSTA COFFEE          	ON 01 JUN CLP,,,PersonalExpense,Coffee
+2022-06-20,20-74-09 40406538,-2.3,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 19 JUN CLP,,,PersonalExpense,COOP
+2022-06-30,20-53-97 30728691,720.0,Counter Credit,M Williams            	RENT BGC,196BKIN,"Rent for period 25/06/2022 - 24/07/2022 from Mr Mark Williams - First Floor Flat, 196 Kingston Road",OurRent,
+2022-06-06,20-74-09 60458872,-49.08,Contactless Card Purchase,BOOTS 6407            	ON 01 JUN CLP,,,PersonalExpense,Pharmacy/Opticians/Dental
+2022-06-20,20-74-09 40406538,-14.4,Contactless Card Purchase,BP NEWHAM AVENUE C    	ON 18 JUN CLP,,,PersonalExpense,Garage
+2022-06-30,20-53-97 30728691,242.99,Counter Credit,BEALS ESTATE AGENT    	FLAT 1216-18 ALHAM BG,F121618ALH,,BealsRent,
+2022-06-06,20-74-09 60458872,-113.0,Card Purchase,HARRODS BEAUTY LTD    	ON 01 JUN BCC,,,PersonalExpense,Beauty
+2022-06-30,20-53-97 30728691,422.29,Counter Credit,BEALS ESTATE AGENT    	FLAT 1612-14 ALHAM BG,F161214ALH,,BealsRent,
+2022-06-20,20-74-09 40406538,-6.0,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 17 JUN CLP,,,PersonalExpense,Garage
+2022-06-06,20-74-09 60458872,-40.0,Funds Transfer,ROCCO                 	REVISION FT,,,PersonalExpense,Other
+2022-06-07,20-74-09 60458872,-7.65,Contactless Card Purchase,POST OFFICE COUNTE    	ON 06 JUN CLP,,,PersonalExpense,Other
+2022-06-30,20-53-97 30728691,303.61,Counter Credit,BEALS ESTATE AGENT    	FLAT 512-14 ALHAMB BG,F51214ALH,,BealsRent,
+2022-06-20,20-74-09 40406538,-17.39,Contactless Card Purchase,BOOTS,,,PersonalExpense,Pharmacy/Opticians/Dental
+2022-06-07,20-74-09 60458872,-40.65,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 06 JUN CLP,,,PersonalExpense,M&S
+2022-06-20,20-74-09 40406538,-3.0,Card Purchase,MILTON_KEYNES_PARK    	ON 19 JUN BCC,,,PersonalExpense,Coffee
+2022-06-07,20-74-09 60458872,-50.0,Card Purchase,Harrods               	ON 06 JUN BCC,,,PersonalExpense,Beauty
+2022-06-20,20-74-09 40406538,-49.0,Card Purchase,HARRODS BEAUTY LTD    	ON 19 JUN BCC,,,PersonalExpense,Beauty
+2022-06-20,20-74-09 40406538,-48.92,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 18 JUN CLP,,,PersonalExpense,M&S
+2022-06-07,20-74-09 60458872,35.0,Counter Credit,LIVERPOOL - SEQUEN    	SEQUENCE UK LIMI BGC,23BHAM,Refund arrangement fee,PropertyExpense,
+2022-06-08,20-74-09 60458872,-8.95,Contactless Card Purchase,POST OFFICE COUNTE    	ON 07 JUN CLP,,,PersonalExpense,Other
+2022-06-20,20-74-09 40406538,-20.05,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 18 JUN CLP,,,PersonalExpense,COOP
+2022-06-08,20-74-09 60458872,-12.4,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 06 JUN CLP,,,PersonalExpense,Garage
+2022-06-20,20-74-09 40406538,-41.17,Contactless Card Purchase,WAITROSE 722          	ON 17 JUN CLP,,,PersonalExpense,Waitrose
+2022-06-08,20-74-09 60458872,470.32,Counter Credit,BEALS ESTATE AGENT    	196A KINGSTON ROAD BG,196AKIN,,BealsRent,
+2022-06-20,20-74-09 40406538,-14.1,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 17 JUN CLP,,,PersonalExpense,COOP
+2022-06-08,20-74-09 60458872,210.61,Counter Credit,BEALS ESTATE AGENT    	FLAT 2171 FAWCETT BGC,F2171FAW,,BealsRent,
+2022-06-20,20-74-09 40406538,-14.25,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 16 JUN CLP,,,PersonalExpense,Garage
+2022-06-08,20-74-09 60458872,452.0,Counter Credit,BEALS ESTATE AGENT    	FLAT 1412-14 ALHAM BG,F141214ALH,,BealsRent,
+2022-06-20,20-74-09 40406538,-30.0,Bill Payment,CLAUDIA TOLLETT       	12 THIGHS BBP,,,PersonalExpense,Other
+2022-06-21,20-74-09 40406538,-33.48,Contactless Card Purchase,WAITROSE 722          	ON 20 JUN CLP,,,PersonalExpense,Waitrose
+2022-06-09,20-74-09 60458872,-24.6,Direct Debit,BHAM MIDSHIRES        	6792116703030000 DDR,F3169FAW,,Mortgage,
+2022-06-22,20-74-09 40406538,-12.6,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 20 JUN CLP,,,PersonalExpense,Garage
+2022-06-10,20-74-09 60458872,433.49,Counter Credit,BEALS ESTATE AGENT    	FLAT 68 ALHAMBRA R BG,F68ALH,,BealsRent,
+2022-06-22,20-74-09 40406538,300.0,Funds Transfer,205397 30728691       	TRF FT,,,Funds3072,
+2022-06-10,20-74-09 60458872,-125.06,Direct Debit,BHAM MIDSHIRES        	6092096352060000 DDR,F41214ALH,,Mortgage,
+2022-06-22,20-74-09 40406538,350.0,Funds Transfer,207409 60458872       	TRF FT,,,Funds6045,
+2022-06-13,20-74-09 60458872,-30.15,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 11 JUN CLP,,,PersonalExpense,Garage
+2022-06-13,20-74-09 60458872,-20.0,Card Purchase,Amazon.co.uk*2C5W8    	ON 13 JUN BCC,F31214ALH,Hoover bags,PropertyExpense,
+2022-06-22,20-74-09 40406538,-2.06,Credit Payment,INTEREST CHARGED      	INTEREST CHARGED,,,OtherExpense,
+2022-06-13,20-74-09 60458872,635.2,Counter Credit,BEALS ESTATE AGENT    	FLAT 1171 FAWCETT BGC,F1171FAW,,BealsRent,
+2022-06-23,20-74-09 40406538,-39.15,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 22 JUN CLP,,,PersonalExpense,M&S
+2022-06-23,20-74-09 40406538,-8.95,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 22 JUN CLP,,,PersonalExpense,COOP
+2022-06-13,20-74-09 60458872,495.0,Standing Order,201280 23186385       	V HAJEK 169 FAWCET ST,F2169FAW,"Rent for period 10/04/2022 - 11/05/2022 from Mr Vaclav Hajek - Flat 2, 169 Fawcett Road, Southsea",OurRent,
+2022-06-13,20-74-09 60458872,650.0,Standing Order,J BOTTLE              	RENT STO,F58ALH,"Rent for period 07/06/2022 - 06/07/2022 from Mr James Bottle - Flat 5, 8 Alhambra Road",OurRent,
+2022-06-23,20-74-09 40406538,-4.65,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 22 JUN CLP,,,PersonalExpense,COOP
+2022-06-23,20-74-09 40406538,-15.95,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 21 JUN CLP,,,PersonalExpense,Garage
+2022-06-13,20-74-09 60458872,630.0,Standing Order,K PARSON              	RENT STO,F1846ALH,"Rent for period 12/06/2022 - 11/07/2022 from Miss Katherine Parson - Flat 18, 4-6 Alhambra Road",OurRent,
+2022-06-24,20-74-09 40406538,-40.18,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 23 JUN CLP,,,PersonalExpense,M&S
+2022-06-13,20-74-09 60458872,-174.09,Direct Debit,BHAM MIDSHIRES        	6092021491040000 DDR,F3169FAW,,Mortgage,
+2022-06-24,20-74-09 40406538,-86.61,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 22 JUN CLP,,,PersonalExpense,Garage
+2022-06-13,20-74-09 60458872,-13.0,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 11 JUN CLP,,,PersonalExpense,COOP
+2022-06-13,20-74-09 60458872,-8.95,Contactless Card Purchase,BP NEWHAM AVENUE C    	ON 10 JUN CLP,,,PersonalExpense,Garage
+2022-06-24,20-74-09 40406538,-6.95,Card Purchase,43035295 COSTA COF    	ON 23 JUN BCC,,,PersonalExpense,Coffee
+2022-06-13,20-74-09 60458872,25.0,Counter Credit,X04025220             	childrens christma BG,,,OtherIncome,
+2022-06-27,20-74-09 40406538,-24.0,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 25 JUN CLP,,,PersonalExpense,COOP
+2022-06-13,20-74-09 60458872,-66.6,Contactless Card Purchase,NAUGHTY PIZZA         	ON 10 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-27,20-74-09 40406538,-10.65,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 25 JUN CLP,,,PersonalExpense,COOP
+2022-06-13,20-74-09 60458872,-20.0,Contactless Card Purchase,A1 Foods              	ON 10 JUN CLP,,,PersonalExpense,A1 Foods
+2022-06-27,20-74-09 40406538,-14.55,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 25 JUN CLP,,,PersonalExpense,Garage
+2022-06-13,20-74-09 60458872,-10.5,Contactless Card Purchase,A1 Foods              	ON 10 JUN CLP,,,PersonalExpense,A1 Foods
+2022-06-27,20-74-09 40406538,-6.95,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 25 JUN CLP,,,PersonalExpense,Garage
+2022-06-13,20-74-09 60458872,-600.0,Funds Transfer,207409 40406538       	TRF FT,,,Funds4040,
+2022-06-27,20-74-09 40406538,1200.0,Standing Order,TUCK&VALEN HSE%0 P    	207409 40406538 STO,,,Funds4040,
+2022-06-14,20-74-09 60458872,700.0,Funds Transfer,INGOLDSBY K A         	FLAT 19 ALHAMBRA FT,F1946ALH,"Rent for period 14/05/2022 - 13/06/2022 from Miss Katie Ingoldsby - Flat 19, 4-6 Alhambra Road, Southsea",OurRent,
+2022-06-27,20-74-09 40406538,-30.0,Bill Payment,EMILIO VALENTINO-     	HAPPY BIRTHDAY BBP,,,PersonalExpense,Other
+2022-06-27,20-74-09 40406538,20.0,Credit,LINK                  82 KIMBOLTON ROAD	25JU,,,OtherIncome,
+2022-06-14,20-74-09 60458872,708.22,Funds Transfer,209254 13676978       	INTERCO 21 FT,,,ServiceCharge,
+2022-06-27,20-74-09 40406538,-20.0,Cash Withdrawal,LINK                  82 KIMBOLTON ROAD	25JU,,,PersonalExpense,Cash
+2022-06-14,20-74-09 60458872,-103.0,Funds Transfer,200574 33631583       	INTERCO 21 FT,,,ServiceCharge,
+2022-06-14,20-74-09 60458872,-19.98,Contactless Card Purchase,CURRYS BEDFORD        	ON 13 JUN CLP,,,PersonalExpense,Houshold
+2022-06-27,20-74-09 40406538,22.99,Contactless Card Refund,ZARA                  	ON 24 JUN CLR,,,PersonalExpense,Clothing
+2022-06-14,20-74-09 60458872,-16.99,Card Purchase,Spotify P1BFB97D9E    	ON 13 JUN BCC,,,PersonalExpense,Amazon
+2022-06-27,20-74-09 40406538,29.99,Card Purchase,Zara.com              	ON 24 JUN BCC,,,PersonalExpense,Clothing
+2022-06-27,20-74-09 40406538,-15.99,Contactless Card Purchase,ZARA                  	ON 24 JUN CLP,,,PersonalExpense,Clothing
+2022-06-14,20-74-09 60458872,-45.0,Bill Payment,CHRISTOPHER ROGERS    	CR 87 3169 ELCE BBP,F3169FAW,Chris Rogers,PropertyExpense,
+2022-06-27,20-74-09 40406538,-10.74,Contactless Card Purchase,STARBUCKS             	ON 24 JUN CLP,,,PersonalExpense,Coffee
+2022-06-14,20-74-09 60458872,-60.0,Bill Payment,CHRISTOPHER ROGERS    	CR 86 4163L IGHT BBP,F4163FRA,Chris Rogers light,PropertyExpense,
+2022-06-14,20-74-09 60458872,-30.0,Cash Withdrawal,CARDTRONICS UK LTD    BP - ELSTOW INTERC	14J,,,PersonalExpense,Cash
+2022-06-27,20-74-09 40406538,-41.88,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 24 JUN CLP,,,PersonalExpense,M&S
+2022-06-27,20-74-09 40406538,-35.5,Contactless Card Purchase,HARRODS BEAUTY LTD    	ON 24 JUN CLP,,,PersonalExpense,Beauty
+2022-06-14,20-74-09 60458872,675.0,Funds Transfer,JOHN A                	RENT FT,F3169FAW,"Rent for period 14/07/2022 - 13/08/2022 from Mr August John - Flat 3, 169 Fawcett Road",OurRent,
+2022-06-27,20-74-09 40406538,-20.95,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 23 JUN CLP,,,PersonalExpense,Garage
+2022-06-15,20-74-09 60458872,314.19,Counter Credit,BEALS ESTATE AGENT    	FLAT 616-18 ALHAMB BG,F61618ALH,,BealsRent,
+2022-06-15,20-74-09 60458872,-265.92,Direct Debit,PLATFORM FUNDING      	01050228979115 DDR,F1946ALH,,Mortgage,
+2022-06-27,20-74-09 40406538,-18.8,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 23 JUN CLP,,,PersonalExpense,Garage
+2022-06-15,20-74-09 60458872,-223.66,Direct Debit,PLATFORM FUNDING      	01050228957650 DDR,F68ALH,,Mortgage,
+2022-06-27,20-74-09 40406538,-25.95,Contactless Card Purchase,B&M 494 - HS BEDFO    	ON 24 JUN CLP,,,PersonalExpense,Houshold
+2022-06-28,20-74-09 40406538,-18.85,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 27 JUN CLP,,,PersonalExpense,COOP
+2022-06-15,20-74-09 60458872,-366.23,Direct Debit,LAND ROVER FS         	579452160 DDR,,,Car,
+2022-06-29,20-74-09 40406538,-39.44,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 28 JUN CLP,,,PersonalExpense,M&S
+2022-06-15,20-74-09 60458872,-13.0,Direct Debit,PAYPAL PAYMENT        	5CM22229DF5GW DDR,,,RegularPayment,
+2022-06-29,20-74-09 40406538,-4.55,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 28 JUN CLP,,,PersonalExpense,M&S
+2022-06-15,20-74-09 60458872,-29.95,Direct Debit,PAYPAL PAYMENT        	5CM22229DF5GW DDR,,,RegularPayment,
+2022-06-29,20-74-09 40406538,-4.7,Contactless Card Purchase,IZ *THE PAVILION T    	ON 28 JUN CLP,,,PersonalExpense,Coffee
+2022-06-16,20-74-09 60458872,-300.0,Funds Transfer,207409 40406538       	TRF FT,,,Funds4040,
+2022-06-16,20-74-09 60458872,-922.8,Bill Payment,A BECK PLUMBING       	13264 4321 BATH BBP,F4321LON,A Beck bath,PropertyExpense,
+2022-06-29,20-74-09 40406538,-9.0,Contactless Card Purchase,CO OPERATIVE FOOD     	ON 28 JUN CLP,,,PersonalExpense,COOP
+2022-06-29,20-74-09 40406538,-20.49,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 27 JUN CLP,,,PersonalExpense,Garage
+2022-06-16,20-74-09 60458872,-870.0,Bill Payment,KP CONSULTANCY        	195 321LON ROOF BBP,321LON,Roof,PropertyExpense,
+2022-06-16,20-74-09 60458872,-300.0,Funds Transfer,ROCCO                 	HAPPYBDAYMUMDAD FT,,,PersonalExpense,Other
+2022-06-29,20-74-09 40406538,-15.7,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 27 JUN CLP,,,PersonalExpense,Garage
+2022-06-16,20-74-09 60458872,497.8,Counter Credit,BEALS ESTATE AGENT    	FLAT 1116-18 ALHAM BG,F111618ALH,,BealsRent,
+2022-06-29,20-74-09 40406538,-129.66,Card Purchase,TESCO PFS 3943        	ON 28 JUN BCC,,,PersonalExpense,Tesco
+2022-06-16,20-74-09 60458872,159.38,Counter Credit,BEALS ESTATE AGENT    	FLAT 3163 FRATTON BGC,F3163FRA,,BealsRent,
+2022-06-30,20-74-09 40406538,-28.14,Contactless Card Purchase,32509 Corporate Bi    	ON 29 JUN CLP,,,PersonalExpense,Other
+2022-06-16,20-74-09 60458872,140.11,Counter Credit,BEALS ESTATE AGENT    	FLAT 712-14 ALHAMB BG,F71214ALH,,BealsRent,
+2022-06-30,20-74-09 40406538,-9.0,Contactless Card Purchase,ZTL*Good Belly Lim    	ON 29 JUN CLP,,,PersonalExpense,Clothing
+2022-06-16,20-74-09 60458872,314.6,Counter Credit,BEALS ESTATE AGENT    	SHOP196 KINGSTON R BG,SHOP196KIN,,BealsRent,
+2022-06-30,20-74-09 40406538,-15.04,Contactless Card Purchase,PRET A MANGER         	ON 29 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-16,20-74-09 60458872,-15.99,Direct Debit,PAYPAL PAYMENT        	5CM22229DF5GW DDR,,,RegularPayment,
+2022-06-30,20-74-09 40406538,-42.5,Contactless Card Purchase,Penhaligons Limite    	ON 29 JUN CLP,,,PersonalExpense,Beauty
+2022-06-16,20-74-09 60458872,-248.73,Direct Debit,BHAM MIDSHIRES        	6092045443050000 DDR,23BHAM,,Mortgage,
+2022-06-30,20-74-09 40406538,-10.35,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 29 JUN CLP,,,PersonalExpense,M&S
+2022-06-16,20-74-09 60458872,-17.73,Direct Debit,BHAM MIDSHIRES        	6792116720030000 DDR,F2321LON,,Mortgage,
+2022-06-30,20-74-09 40406538,-6.01,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 29 JUN CLP,,,PersonalExpense,M&S
+2022-06-30,20-74-09 40406538,-10.06,Contactless Card Purchase,KFC BEDFORD           	ON 29 JUN CLP,,,PersonalExpense,EatingOut
+2022-06-17,20-74-09 60458872,550.0,Counter Credit,CIPRIAN GEORGESCU     	F2 321 LONDON ROAD BG,F2321LON,"Rent for period 18/06/2022 - 17/07/2022 from Mr Ciprian Georgescu - Flat 2, 321 London Rd",OurRent,
+2022-06-17,20-74-09 60458872,-14.22,Card Purchase,AMZNMktplace          	ON 16 JUN BCC,F31214ALH,Stylus pen for galaxy note,PropertyExpense,
+2022-06-30,20-74-09 40406538,-8.95,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 28 JUN CLP,,,PersonalExpense,Garage
+2022-06-30,20-74-09 40406538,-19.47,Contactless Card Purchase,BOOTS 6407            	ON 29 JUN CLP,,,PersonalExpense,Pharmacy/Opticians/Dental
+2022-06-17,20-74-09 60458872,-25.0,Bill Payment,SUSAN ZALENSKI        	ROCCO BBP,,,PersonalExpense,Other
+2022-06-30,20-74-09 40406538,-151.0,Card Purchase,Bang & Olufsen UK     	ON 29 JUN BCC,,,PersonalExpense,Other
+2022-06-17,20-74-09 60458872,25.0,Counter Credit,X04025220             	childrens christma BG,,,OtherIncome,
+2022-06-17,20-74-09 60458872,-135.0,Funds Transfer,ROCCO                 	BIRTHDAYMONEY FT,,,PersonalExpense,Other
+2022-06-20,20-74-09 60458872,-63.08,Card Purchase,ZARA                  	ON 19 JUN BCC,,,PersonalExpense,Clothing
+2022-06-20,20-74-09 60458872,-15.0,Card Purchase,MICROSOFT*STORE       	ON 19 JUN BCC,,,PersonalExpense,Amazon
+2022-06-20,20-74-09 60458872,-178.71,Direct Debit,BHAM MIDSHIRES        	6092042862000000 DDR,F2321LON,,Mortgage,
+2022-06-20,20-74-09 60458872,84.0,Card Purchase,SP OH POLLY           	ON 18 JUN BCC,,,PersonalExpense,Clothing
+2022-06-20,20-74-09 60458872,-7.99,Card Purchase,Amazon Prime*275P6    	ON 18 JUN BCC,,,PersonalExpense,Amazon
+2022-06-20,20-74-09 60458872,-550.0,Bill Payment,PORTSEA ISLAND PRO    	212 3321LON REDEC BBP,F3321LON,Portsea decorating,PropertyExpense,
+2022-06-21,20-74-09 60458872,-7.65,Contactless Card Purchase,POST OFFICE COUNTE    	ON 20 JUN CLP,,,PersonalExpense,Other
+2022-06-21,20-74-09 60458872,-47.22,Contactless Card Purchase,MARKS&SPENCER PLC     	ON 20 JUN CLP,,,PersonalExpense,M&S
+2022-06-22,20-74-09 60458872,-50.0,Funds Transfer,ROCCO                 	WELLDONEEXAMS FT,,,PersonalExpense,Other
+2022-06-22,20-74-09 60458872,-30.0,Funds Transfer,ROCCO                 	BDAYFROMFRIENDS FT,,,PersonalExpense,Other
+2022-06-22,20-74-09 60458872,-33.4,Card Purchase,AMZNMktplace          	ON 21 JUN BCC,F31214ALH,Shower curtain Peter Taparek,PropertyExpense,
+2022-06-22,20-74-09 60458872,-5.79,Card Purchase,AMZNMktplace          	ON 21 JUN BCC,F31214ALH,Oven button Peter,PropertyExpense,
+2022-06-22,20-74-09 60458872,15.72,Funds Transfer,209254 13438023       	INTERNET FEE FT,,,AlhambraPayment,
+2022-06-22,20-74-09 60458872,-350.0,Funds Transfer,207409 40406538       	TRF FT,,,Funds4040,
+2022-06-22,20-74-09 60458872,-224.58,Direct Debit,BHAM MIDSHIRES        	6092076296020000 DDR,196AKIN,,Mortgage,
+2022-06-22,20-74-09 60458872,880.0,Funds Transfer,IVANOV M              	RENTJULY FT,F131618ALH,"Rent for period 22/06/2022 - 21/07/2022 from Mr Martin Ivanov - Flat 13, 16-18 Alhambra Road",OurRent,
+2022-06-23,20-74-09 60458872,-28.35,Contactless Card Purchase,BP BEDFORD EXPRESS    	ON 21 JUN CLP,,,PersonalExpense,Garage
+2022-06-23,20-74-09 60458872,-152.43,Card Purchase,WWW.OVOENERGY.COM     	ON 22 JUN BCC,F31214ALH,Electric - not sure putting down as Greer's flat,PropertyExpense,
+2022-06-23,20-74-09 60458872,700.0,Counter Credit,Ivo Spinola Ramos     	Flat 4 12-14 rent BGC,F41214ALH,"Rent for period 23/06/2022 - 22/07/2022 from Miss Ana Gomes and Mr Ivo Ramos - Flat 4, 12-14 Alhambra Road",OurRent,
+2022-06-23,20-74-09 60458872,140.55,Counter Credit,BEALS ESTATE AGENT    	FLAT 1012-14 ALHAM BG,F101214ALH,,BealsRent,
+2022-06-24,20-74-09 60458872,-15.0,Standing Order,SSE SOUTHERN ELECT    	6882766014 STO,169FAW,Electric,PropertyExpense,
+2022-06-24,20-74-09 60458872,-5.0,Direct Debit,PAYPAL PAYMENT        	5CM22229DF5GW DDR,,,RegularPayment,
+2022-06-24,20-74-09 60458872,-25.0,Funds Transfer,ROCCO                 	MOREMONEY FT,,,PersonalExpense,Other
+2022-06-27,20-74-09 60458872,-10.99,Card Purchase,Microsoft*Ultimate    	ON 26 JUN BCC,,,PersonalExpense,Amazon
+2022-06-27,20-74-09 60458872,-28.8,Direct Debit,PAYPAL PAYMENT        	5CM22229DF5GW DDR,,,RegularPayment,
+2022-06-27,20-74-09 60458872,695.0,Counter Credit,S Lindemere           	20,F2046ALH,"Rent for period 24/06/2022 - 23/07/2022 from Mr Jake Lindemere - Flat 20, 4-6 Alhambra Road",OurRent,
+2022-06-27,20-74-09 60458872,49.99,Card Purchase,Zara.com              	ON 24 JUN BCC,,,PersonalExpense,Clothing
+2022-06-27,20-74-09 60458872,-11.79,Card Purchase,AMZNMktplace          	ON 24 JUN BCC,F31214ALH,Oven button Peter,PropertyExpense,
+2022-06-28,20-74-09 60458872,650.0,Standing Order,MISS SOPHIE H BEDF    	FLAT 17 ALHAMBRA STO,F1746ALH,"Rent for period 29/06/2022 - 28/07/2022 from Miss Sophie Bedford - Flat 17, 4-6 Alhambra Road",OurRent,
+2022-06-28,20-74-09 60458872,446.0,Counter Credit,BEALS ESTATE AGENT    	FLAT 1321 LONDON R BG,F1321LON,,BealsRent,
+2022-06-29,20-74-09 60458872,-158.74,Direct Debit,BHAM MIDSHIRES        	6092036837070000 DDR,F4163FRA,,Mortgage,
+2022-06-30,20-74-09 60458872,-150.0,Bill Payment,EXPRESS ELECTRICAL    	20076 LONDON ROAD BBP,321LON,Express electrical,PropertyExpense,
+2022-06-30,20-74-09 60458872,-80.0,Bill Payment,PORTSEA ISLAND PRO    	216 4163 WIN HING BBP,F4163FRA,Portsea decorating,PropertyExpense,
+2022-06-30,20-74-09 60458872,-29.95,Card Purchase,Vue Entertainment     	ON 29 JUN BCC,,,PersonalExpense,Amazon
+2022-06-30,20-74-09 60458872,-50.0,Bill Payment,PETER TAPEREK         	2246 BBP,F2246ALH,Peter Taparek,PropertyExpense,
+2022-06-30,20-74-09 60458872,725.0,Counter Credit,A Ibiyemi             	RENT 3 321 LONDON BGC,F3321LON,"Rent for period 01/07/2022 - 30/08/2022 from Mrs Adebusola Ibiyemi - Flat 3, 321 London Road",OurRent,
+2022-06-30,20-74-09 60458872,750.0,Counter Credit,S Kumar               	FLAT 4,F4321LON,"Rent for period 26/06/2022 - 25/07/2022 from Mr Susheel Kumar - Flat 4, 321 London Road",OurRent,
+2022-06-30,20-74-09 60458872,241.39,Counter Credit,BEALS ESTATE AGENT    	FLAT 2171 FAWCETT BGC,F2171FAW,,BealsRent,
+2022-06-30,20-74-09 60458872,311.89,Counter Credit,BEALS ESTATE AGENT    	FLAT 712-14 ALHAMB BG,F71214ALH,,BealsRent,
+2022-06-30,20-74-09 60458872,137.81,Counter Credit,BEALS ESTATE AGENT    	FLAT 616-18 ALHAMB BG,F61618ALH,,BealsRent,
+2022-06-30,20-74-09 60458872,423.56,Counter Credit,BEALS ESTATE AGENT    	FLAT 1169 FAWCETT BGC,F1169FAW,,BealsRent,
+2022-06-30,20-74-09 60458872,246.82,Counter Credit,BEALS ESTATE AGENT    	FLAT 3163 FRATTON BGC,F3163FRA,,BealsRent,
+2022-06-30,20-74-09 60458872,311.45,Counter Credit,BEALS ESTATE AGENT    	FLAT 1012-14 ALHAM BG,F101214ALH,,BealsRent,
+2022-06-30,20-74-09 60458872,-251.35,Direct Debit,MORTGAGE TRUST        	002186357 10118690 DD,F1746ALH,,Mortgage,
+2022-06-30,20-74-09 60458872,-251.35,Direct Debit,MORTGAGE TRUST        	002186356 10118690 DD,F1846ALH,,Mortgage,
+2022-06-30,20-74-09 60458872,-251.35,Direct Debit,MORTGAGE TRUST        	002186317 10118690 DD,F58ALH,,Mortgage,
+2022-06-30,20-74-09 60458872,-249.86,Direct Debit,MORTGAGE TRUST        	002197389 10118690 DD,F71214ALH,,Mortgage,
