@@ -59,4 +59,30 @@ The pipeline supports **property rental analytics**: it turns raw bank exports i
 
 ## 5. Review app (optional)
 
-If the user prefers the web app for review: from repo root, set `REVIEW_APP_PASSWORD` and run `uvicorn backend.main:app --reload --port 8000`, then `cd frontend && npm run dev`. They can use Draft and Queue pages to correct labels; the app persists to the DB and updates the review queue XLSX so they can stop and resume later.
+The **Review App** is a web UI (React frontend + FastAPI backend) for reviewing and correcting transaction labels. It reads and writes the same database and files as the pipeline, so the user can use it instead of editing the review queue XLSX in Excel. Changes are saved immediately to the DB, and the review queue spreadsheet is updated after each correction so partial progress is preserved (they can stop and resume later).
+
+**What it does:**
+- **Home** — Pick a month; see how many transactions need review; open Draft, Review queue, or Reports for that month.
+- **Draft** (`/review/:month`) — All transactions for the month. Filter by property, category, subcategory, search text, date range. Edit **Property**, **Category**, and **Subcategory** via inline dropdowns (saves on change). Add or remove rows from the review queue; submit review when done. Shows sum of amount for filtered rows. Download CSV.
+- **Queue** (`/review/:month/queue`) — Only rows that need review (`needs_review=1`). Same inline editing and filters. Correcting a row removes it from the queue and updates the queue XLSX so the file reflects “remaining to review”.
+- **Reports** — Month or date-range summary: property summary, outgoings, personal spending (tables and charts). Uses the same data as the 3.0 MonthlySummary logic.
+- **Settings** — Add new property codes, categories, or subcategories (stored in the DB for dropdowns and pipeline).
+
+**How to run the Review App:**
+
+1. **Backend** (from repo root). Set the login password and start the API:
+   ```bash
+   set REVIEW_APP_PASSWORD=yourpassword
+   uvicorn backend.main:app --reload --port 8000
+   ```
+   (On Unix/macOS use `export REVIEW_APP_PASSWORD=yourpassword`.) Leave this terminal running.
+
+2. **Frontend** (new terminal, from repo root):
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   The dev server usually runs at http://localhost:5173 and proxies `/api` to the backend.
+
+3. **Use the app:** Open http://localhost:5173 in a browser. Log in with the same value as `REVIEW_APP_PASSWORD`. Choose a month on Home, then open **Review queue** to work through items that need review, or **Draft** to see all transactions and add/remove from the queue. When finished, tell the agent to finalize the month(s).
