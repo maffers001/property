@@ -83,6 +83,14 @@ _mortgage_map_raw = [
     (r'^MORTGAGE EXPRESS\s*200878410.*$|^TOPAZ FIN.*190959705.*$', 'F121618ALH'),
     (r'^MORTGAGE EXPRESS\s*200710776.*$|^TOPAZ FIN ROSINCA.*134338410.*$', 'F131618ALH'),
     (r'^MORTGAGE EXPRESS\s*200766478.*$|^TOPAZ FIN.*190892600.*$', 'F161618ALH'),
+    # 56047xxxxx reference patterns (Mortgage)
+    (r'.*560471810.*', 'F2246ALH'),
+    (r'.*560471701.*', 'F2046ALH'),
+    (r'.*560470708.*', 'F2346ALH'),
+    (r'.*560476808.*', 'F61618ALH'),
+    (r'.*560470610.*', 'F78ALH'),
+    (r'.*560471505.*', 'F1946ALH'),
+    (r'.*560470501.*', 'F68ALH'),
 ]
 
 # Sub-phase 1b: allocate_codes_for_rents_and_expenses (no subcategory filter)
