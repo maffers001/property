@@ -4,11 +4,13 @@ import os.path
 import shutil
 import datetime
 from dateutil.rrule import rrule, MONTHLY
+from pathlib import Path
 
-#generated_path = 'E:\\dtuklaptop\\e\\Users\\Mat\\python\\data\\property\\checked\\'
-#tcy_path=r'E:\\dtuklaptop\\e\Users\\Mat\\python\\data\\property\\bank-download\\'
-generated_path = 'J://My Drive//NAS//My Documents//Business//Property//Statements//working//python//data//property//checked//'
-tcy_path = 'J://My Drive//NAS//My Documents//Business//Property//Statements//working//python//data//property//bank-download//'
+# Repo data lives in <repo>/data/property (not the old NAS python/data path).
+_DATA = Path(__file__).resolve().parents[2] / "data" / "property"
+generated_path = str(_DATA / "checked") + os.sep
+tcy_path = str(_DATA / "bank-download") + os.sep
+_NAS_BANK = "J://My Drive//NAS//My Documents//Business//Property//Statements//working//python//data//property//bank-download//"
 
 class Property:
     def __init__(self, pid):
@@ -133,7 +135,21 @@ property_id_map = {
 }
 
 def load_tenancies(tenancy_datafile):
-    input_file = tcy_path + tenancy_datafile
+    candidates = [
+        Path(tcy_path) / tenancy_datafile,
+        Path(_NAS_BANK) / tenancy_datafile,
+        Path(tenancy_datafile),
+    ]
+    input_file = None
+    for p in candidates:
+        if p.is_file():
+            input_file = str(p)
+            break
+    if input_file is None:
+        raise FileNotFoundError(
+            f"{tenancy_datafile} not found. Put it in {_DATA / 'bank-download'} "
+            "(or keep a copy on the old NAS path)."
+        )
     dfT = pd.read_excel(input_file,index_col=0,header=None,sheet_name='Sheet 1',names=['PROPERTY_ID','PROPERTY_NAME','TENANCY_ID','TENANT','START_DATE','END_DATE','RENT_AMOUNT','RENT_FREQ','AGENT_NAME','FEE_AMOUNT','FEE_TYPE','VAT'])
     return dfT
 
