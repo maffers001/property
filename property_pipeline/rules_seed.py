@@ -515,4 +515,14 @@ def get_categories_and_subcategories():
                 subcategories.add(out["subcategory"])
         except (json.JSONDecodeError, TypeError):
             pass
+    try:
+        from .learned_rules import load_learned_rules
+        for r in load_learned_rules():
+            out = json.loads(r.get("outputs_json") or "{}")
+            if out.get("category"):
+                categories.add(out["category"])
+            if out.get("subcategory"):
+                subcategories.add(out["subcategory"])
+    except (OSError, json.JSONDecodeError, TypeError):
+        pass
     return (sorted(categories), sorted(subcategories))

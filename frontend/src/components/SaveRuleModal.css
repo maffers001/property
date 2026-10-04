@@ -1,0 +1,141 @@
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 14, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #1e1e2e;
+  color: #eee;
+  padding: 1.25rem 1.5rem;
+  border-radius: 8px;
+  min-width: 420px;
+  max-width: 94vw;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
+.modal-card-wide {
+  min-width: min(920px, 94vw);
+}
+
+.other-matches {
+  margin-top: 1rem;
+}
+
+.other-matches h3 {
+  font-size: 1rem;
+  margin: 0 0 0.4rem;
+}
+
+.other-matches-wrap {
+  max-height: 220px;
+  overflow: auto;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+
+.other-matches-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.other-matches-table th,
+.other-matches-table td {
+  text-align: left;
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid #333;
+  vertical-align: top;
+}
+
+.other-matches-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.other-matches-table .memo {
+  max-width: 22rem;
+  word-break: break-word;
+}
+
+.row-conflict {
+  background: rgba(180, 60, 60, 0.22);
+}
+
+.modal-card h2 {
+  margin-top: 0;
+}
+
+.modal-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0.6rem 0;
+  font-size: 0.9rem;
+}
+
+.modal-card input,
+.modal-card select {
+  padding: 0.4rem 0.5rem;
+  background: #161622;
+  color: #eee;
+  border: 1px solid #444;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.modal-actions button {
+  padding: 0.45rem 0.8rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-actions .btn-primary {
+  background: #3d3d6b;
+  color: #eee;
+}
+
+.modal-actions .btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sample-text {
+  font-size: 0.85rem;
+  word-break: break-word;
+  margin: 0.4rem 0 0;
+}
+
+.match-status {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.85rem;
+  min-height: 1.2em;
+}
+
+.match-ok {
+  color: #6a6;
+}
+
+.match-fail {
+  color: #e88;
+}
+
+.missed-samples {
+  font-size: 0.8rem;
+  max-height: 6rem;
+  overflow: auto;
+  margin: 0.25rem 0 0.75rem;
+  padding-left: 1.2rem;
+}

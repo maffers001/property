@@ -18,6 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Link to="/home">Home</Link>
           <Link to="/reports">Reports</Link>
           <Link to="/settings">Settings</Link>
+          <Link to="/rules">Rules</Link>
         </div>
         <button type="button" className="nav-logout" onClick={handleLogout}>
           Log out

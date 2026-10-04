@@ -2,7 +2,7 @@
 
 This document is a catch-up guide: what the project is, how the current Python pipeline works, and important decisions from development chats (Phase 3, review/finalize, Excel UX, extra property-matching rules, Review App, OpenClaw skill, and VPS/seeding).
 
-For day-to-day commands see `property_pipeline/README.md`. For business categories, property codes, and the old notebook flow see `PROJECT_CONTEXT.md`. OpenClaw agent instructions live in `scripts/openclaw/property-pipeline/SKILL.md`.
+For the **monthly steps** see `documentation/PROCESS.md`. For **how to back up and restore** `labels.db` see `documentation/BACKUP.md`. For day-to-day CLI extras see `property_pipeline/README.md`. For business categories, property codes, and the old notebook flow see `PROJECT_CONTEXT.md`. OpenClaw agent instructions live in `scripts/openclaw/property-pipeline/SKILL.md`.
 
 ---
 
@@ -27,15 +27,19 @@ The old Jupyter flow (notebooks 1.0 → 1.5 → 2.0 → manual check → 3.0) is
 
 | Path | Purpose |
 |------|--------|
-| `data/property/bank-download/` | Bank CSVs (inputs) |
-| `data/property/generated/` | Draft outputs + diagnostics |
-| `data/property/review/` | Review queue XLSX |
-| `data/property/checked/` | Final files after review |
+| `data/property/bank-download/` | Monthly bank CSVs the pipeline reads |
+| `data/property/bank-download/incoming/` | Drop raw downloads here, then run `scripts/preprocess_bank_downloads.py` |
+| `data/property/bank-download/all_tenancies.xls` | Update on a new tenancy |
+| `data/property/generated/` | Full-month coded files and diagnostics |
+| `data/property/checked/` | Final month files for 3.0 MonthlySummary |
 | `data/property/labels.db` | SQLite: canonical txs, labels, rules, properties |
+| `data/property/learned_rules.json` | Rules saved in the Review App |
+| `data/property/backups/` | Automatic copies of `labels.db` (see `documentation/BACKUP.md`) |
 | `property_pipeline/` | Import, four-pass rule engine, export, CLI |
 | `backend/` + `frontend/` | Optional Review App (FastAPI + React) |
 | `scripts/openclaw/` | OpenClaw skill so an agent can run the pipeline |
-| `scripts/check_bank_downloads.py` | Poll `bank-download/` for months; `--run` only if all four files exist |
+| `scripts/preprocess_bank_downloads.py` | Split/normalise `incoming/` into monthly CSVs |
+| `scripts/check_bank_downloads.py` | Poll `bank-download/` for months; `--run` only if all four files exist (skips months already in the DB unless `--yes`) |
 | `scripts/wipe_db.py` | Empty all tables in `labels.db` (asks `y/N`; then VACUUM) |
 | `python/PropertyAnalytics_v2/` | Original notebooks |
 
@@ -56,7 +60,7 @@ From repo root, after `pip install -r requirements.txt` (includes scikit-learn a
 python -m property_pipeline seed_db
 python -m property_pipeline run_month OCT2025
 python -m property_pipeline run_month OCT2025 --use-ml
-python -m property_pipeline review_month OCT2025
+python -m property_pipeline run_month OCT2025 --yes   # skip confirm; still snapshots first
 python -m property_pipeline finalize_month OCT2025
 python -m property_pipeline load_historical
 python -m property_pipeline grade_rules
@@ -67,9 +71,11 @@ python scripts/check_bank_downloads.py --run    # run_month only for complete mo
 python scripts/wipe_db.py                       # wipe labels.db (confirm y)
 ```
 
-`run_month` calls `seed_db` first, so rules/properties from `property_pipeline/rules_seed.py` are written into the DB (`INSERT OR REPLACE`). Re-running a month **clears that month’s data first** (labels, canonical, raw) then re-imports, so it is a full replace.
+`run_month` calls `seed_db` first, so rules/properties from `property_pipeline/rules_seed.py` are written into the DB (`INSERT OR REPLACE`). Re-running a month **clears that month’s data first** (labels, canonical, raw) then re-imports, so it is a full replace. If the month already has transactions, the CLI asks you to type the month code (or pass `--yes`). A copy of `labels.db` is written to `data/property/backups/` first.
 
-**Polling:** `check_bank_downloads.py --run` waits until all four bank files for a month are present; incomplete months are skipped.
+**Polling:** `check_bank_downloads.py --run` waits until all four bank files for a month are present; incomplete months are skipped. Months already in the DB are skipped unless you pass `--yes`.
+
+How to copy or restore the database: **`documentation/BACKUP.md`**.
 
 ---
 
@@ -92,24 +98,19 @@ After editing `rules_seed.py`, load into the DB with `python -m property_pipelin
 
 ## 5. Review and finalize (important behavioural points)
 
-Typical month:
+Typical month (detail: **`documentation/PROCESS.md`**):
 
-1. `run_month MMMYYYY` → draft in `generated/`, queue in `review/review_queue_MMMYYYY.xlsx`.
-2. Edit property / category / subcategory in the queue (Excel or Review App).
-3. `review_month MMMYYYY` → new **manual** label versions in `transactions_labels` (needed if you edited the XLSX in Excel).
-4. `finalize_month MMMYYYY` → rebuilds the spreadsheet **from the DB** (latest label per transaction) and writes `checked/` **and** updates `generated/` so they match.
+1. Preprocess `incoming/` → `run_month` / `check_bank_downloads.py --run` → labels in `labels.db` (and a draft in `generated/`).
+2. Review App → **Review MMMYYYY** (defaults to needs-review rows). Dropdowns save immediately; optional Save as rule; Mark reviewed / Done reviewing.
+3. `finalize_month MMMYYYY` → rebuilds the spreadsheet **from the DB** and writes `checked/` **and** updates `generated/`.
 
-**Partial reviews persist.** Inline corrections in the Review App write a new label immediately (`reviewed=1`, `needs_review=0`). Add/remove from review and each correct also rewrite `review/review_queue_MMMYYYY.xlsx` so it contains only remaining `needs_review=1` rows. You can stop and resume later; the app and the spreadsheet stay in sync. If the queue becomes empty, the export may skip writing a new file, so the last XLSX can still hold old rows until you finalize.
+**Partial reviews persist** in the database. Uncheck **Needs review only** to edit a row the engine was sure about.
 
-**Corrections not in the queue:** add a row to the review XLSX with at least `tx_id`, `property_code`, `category`, `subcategory`, then run `review_month`. The command applies **every row in the file**.
+**Do not re-run `run_month` for a reviewed month** unless you intend to wipe that month’s labels. Confirm by typing the month code (`--yes` skips the prompt). A snapshot is written to `data/property/backups/` if `labels.db` already exists. See `BACKUP.md`.
 
-**`review_month` is not idempotent:** every run inserts a new label version for every row, even if nothing changed. Re-run only after real edits.
-
-**Review does not invent regexes.** Manual labels help `grade_rules` and `train_ml`. New merchant/memo patterns must be added in `rules_seed.py`.
+**Review does not invent regexes** unless you use **Save as rule**. Manual labels also help `grade_rules` and `train_ml`. New seed patterns still go in `rules_seed.py`.
 
 **Blank CSV rows:** trailing empty Barclays *and* Starling lines used to become fake transactions. Importers skip rows with no date, zero amount, and no memo/counterparty/reference/notes.
-
-**Excel file locked:** if `review_queue_*.xlsx` is open in Excel, Windows raises Permission denied. Close the file and re-run.
 
 ---
 
@@ -117,8 +118,7 @@ Typical month:
 
 | File | Meaning |
 |------|---------|
-| `generated/MMMYYYY_codedAndCategorised.xlsx` | Main draft (Data + Lists sheets) |
-| `review/review_queue_MMMYYYY.xlsx` | Rows flagged for review |
+| `generated/MMMYYYY_codedAndCategorised.xlsx` | Full-month snapshot (Data + Lists sheets) |
 | `generated/DDCheck_MMMYYYY.csv` | Direct debits and Beals (mortgage/DD check) |
 | `generated/CatCheck_MMMYYYY.csv` | All categorised rows (audit) |
 
@@ -155,18 +155,25 @@ Mortgage reference numbers (`_mortgage_map_raw`):
 
 ---
 
-## 8. Optional Review App
+## 8. Review App
 
-Web UI (`backend/` + `frontend/`) on the same SQLite DB and files as the pipeline (alternative to editing the queue XLSX in Excel).
+Web UI (`backend/` + `frontend/`) on the same SQLite DB. This is the normal review path (not a queue spreadsheet).
 
-**Requires Python 3.13.11.** Login password is `REVIEW_APP_PASSWORD`. Backend: `uvicorn backend.main:app --reload --port 8000` from repo root. Frontend: `cd frontend && npm run dev` (usually http://localhost:5173, proxies `/api`).
+**Requires Python 3.13.11.** Login password is `REVIEW_APP_PASSWORD`. From repo root, Windows (avoid `--reload`; it can hang):
+
+```bash
+set REVIEW_APP_PASSWORD=yourpassword
+uvicorn backend.main:app --port 8000
+```
+
+Frontend: `cd frontend && npm run dev` (http://localhost:5173, proxies `/api`).
 
 | Page | Role |
 |------|------|
-| Home | Month picker, count of rows needing review, links to Draft / Queue / Reports |
-| Draft (`/review/:month`) | All txs; filters; inline Property/Cat/Subcat dropdowns (save on change); add/remove review; submit; amount sum; CSV download |
-| Queue (`/review/:month/queue`) | Only `needs_review=1`; same editing; correcting a row drops it from the queue and updates the XLSX |
-| Reports | Month or date range: property summary, outgoings, personal spending (same idea as 3.0 MonthlySummary) |
+| Home | Month picker, count of rows needing review, link to Review / Reports / Rules |
+| Review (`/review/:month`) | All txs; **Needs review only** filter (default on); inline Property/Cat/Subcat; add/remove flag; Mark reviewed / Done reviewing; Save as rule; amount sum; CSV of current view |
+| Reports | Month or date range: property summary, outgoings, personal spending |
+| Rules | Edit regex categorisation rules |
 | Settings | Add property / category / subcategory values (`custom_list_entries`) |
 
 ---
@@ -196,8 +203,8 @@ Creates `data/property/labels.db` and tables (canonical, labels, rules, properti
 ```bash
 pip install -r requirements.txt
 python -m property_pipeline seed_db
+python scripts/preprocess_bank_downloads.py
 python scripts/check_bank_downloads.py
-python -m property_pipeline run_month MMMYYYY
 ```
 
-Then review the queue, `review_month`, `finalize_month`. For ML: `load_historical` → `grade_rules` → `train_ml` → `run_month … --use-ml`.
+Then follow `documentation/PROCESS.md` (import if complete, review in the app, `finalize_month`). For ML: `load_historical` → `grade_rules` → `train_ml` → `run_month … --use-ml`.

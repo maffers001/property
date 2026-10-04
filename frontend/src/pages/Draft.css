@@ -2,6 +2,20 @@
   margin-top: 0;
 }
 
+.queue-scope {
+  color: #aaa;
+  margin: -0.5rem 0 0.75rem;
+  font-size: 0.95rem;
+}
+
+.queue-all-months {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+
 .draft-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -48,7 +62,80 @@
   cursor: not-allowed;
 }
 
+.btn-done {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.8rem;
+  background: #3d3d6b;
+  color: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-done:hover {
+  background: #52528a;
+}
+
+.col-done {
+  width: 7.5rem;
+  white-space: nowrap;
+}
+
+.btn-rule {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.8rem;
+  background: #3d3d6b;
+  color: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-rule:hover {
+  background: #52528a;
+}
+
+.col-rule {
+  width: 8rem;
+  white-space: nowrap;
+}
+
 .draft-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.undo-bar {
+  position: sticky;
+  bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  background: #2a2a48;
+  border: 1px solid #4a4a7a;
+  border-radius: 6px;
+  z-index: 20;
+}
+
+.undo-bar button {
+  padding: 0.3rem 0.7rem;
+  background: #4a4a8a;
+  color: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.undo-bar button:hover {
+  background: #5c5ca0;
+}
   margin-top: 1.5rem;
   display: flex;
   align-items: center;

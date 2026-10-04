@@ -10,13 +10,15 @@ from .config import (
     BANK_DOWNLOAD_DIR, GENERATED_DIR, CHECKED_DIR, REVIEW_DIR, DB_PATH,
 )
 from .db import init_db, get_db
-from .importers import load_month_files
+from .db_backup import MonthAlreadyImported, month_import_counts, snapshot_db
+from .importers import load_month_files, month_posted_date_bounds
 from .engine import run_engine
 from .export import (
     build_output_dataframe, write_xlsx, write_csv,
-    write_review_queue, write_diagnostic_ddcheck, write_diagnostic_catcheck,
+    write_diagnostic_ddcheck, write_diagnostic_catcheck,
 )
 from .rules_seed import get_all_rules, get_categories_and_subcategories, PROPERTIES_SEED
+from .learned_rules import load_learned_rules
 
 
 def _backup_if_exists(filepath: Path) -> None:
@@ -54,6 +56,18 @@ def seed_db(db_path: Path | str | None = None) -> None:
                 (r["rule_id"], r["order_index"], r["phase"], r["pattern"],
                  r["outputs_json"], r["strength"], r["apply_when_json"],
                  r["banks_json"], r["accounts_json"], r["enabled"]),
+            )
+
+        # Overlay user-learned rules (wins over seed for the same rule_id)
+        for r in load_learned_rules():
+            conn.execute(
+                """INSERT OR REPLACE INTO rules
+                   (rule_id, order_index, phase, pattern, outputs_json,
+                    strength, apply_when_json, banks_json, accounts_json, enabled)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (r["rule_id"], r.get("order_index", -1), r["phase"], r["pattern"],
+                 r["outputs_json"], r.get("strength", "strong"), r.get("apply_when_json"),
+                 r.get("banks_json"), r.get("accounts_json"), r.get("enabled", 1)),
             )
 
         # Seed default config
@@ -98,14 +112,28 @@ def _load_rule_performance(conn: sqlite3.Connection) -> dict[str, dict]:
 
 
 def _load_canonical_for_month(conn: sqlite3.Connection, month_str: str) -> list[dict]:
-    """Load canonical transactions for a given import_batch_id (month)."""
+    """Load canonical transactions for a given import_batch_id (month).
+
+    Rows whose posted_date falls outside that calendar month are omitted
+    (Barclays CSVs often include the last day of the previous month).
+    """
     cursor = conn.execute(
         """SELECT * FROM transactions_canonical
            WHERE import_batch_id = ? AND is_superseded = 0
            ORDER BY posted_date, tx_id""",
         (month_str,),
     )
-    return [dict(row) for row in cursor.fetchall()]
+    rows = [dict(row) for row in cursor.fetchall()]
+    try:
+        start, end = month_posted_date_bounds(month_str)
+    except (ValueError, TypeError):
+        return rows
+    kept = []
+    for row in rows:
+        d = str(row.get("posted_date") or "")[:10]
+        if d and start <= d <= end:
+            kept.append(row)
+    return kept
 
 
 def _load_latest_labels_for_tx_ids(conn: sqlite3.Connection, tx_ids: list[str]) -> list[dict]:
@@ -230,6 +258,7 @@ def run_month(
     output_dir: Path | str | None = None,
     use_ml: bool = False,
     model_path: Path | str | None = None,
+    yes: bool = False,
 ) -> dict:
     """Run the full pipeline for a single month.
 
@@ -240,6 +269,7 @@ def run_month(
         output_dir: override for output folder (generated/)
         use_ml: if True, load ML model and override catch_all / low-confidence labels when ML is confident
         model_path: path to saved ML model (default from config)
+        yes: if True, skip the existing-month guard (CLI --yes after confirm)
 
     Returns:
         Summary dict with counts.
@@ -247,6 +277,14 @@ def run_month(
     bd_dir = Path(bank_download_dir) if bank_download_dir else BANK_DOWNLOAD_DIR
     db = db_path or DB_PATH
     gen_dir = Path(output_dir) if output_dir else GENERATED_DIR
+
+    existing = month_import_counts(month_str, db)
+    if existing["n_tx"] > 0 and not yes:
+        raise MonthAlreadyImported(month_str, existing)
+
+    snap = snapshot_db(db, reason="before-run", month_str=month_str)
+    if snap:
+        print(f"Database snapshot: {snap}")
 
     seed_db(db)
 
@@ -320,18 +358,8 @@ def run_month(
     write_csv(output_df, draft_csv)
     print(f"Draft written: {draft_xlsx}")
 
-    # Review queue
-    review_dir = REVIEW_DIR
-    review_dir.mkdir(parents=True, exist_ok=True)
-    review_path = review_dir / f"review_queue_{month_str}.xlsx"
-    _backup_if_exists(review_path)
-    n_review = write_review_queue(
-        canonical_rows, labels, review_path,
-        property_codes=property_codes_list,
-        categories=categories,
-        subcategories=subcategories,
-    )
-    print(f"Review queue: {n_review} items -> {review_path}")
+    n_review = sum(1 for lab in labels if lab.get("needs_review"))
+    print(f"{n_review} transactions flagged for review — open the Review App, then finalize_month when done.")
 
     # Diagnostics
     dd_path = gen_dir / f"DDCheck_{month_str}.csv"
@@ -347,7 +375,6 @@ def run_month(
         "total_transactions": len(canonical_rows),
         "needs_review": n_review,
         "draft_xlsx": str(draft_xlsx),
-        "review_queue": str(review_path),
     }
 
 
@@ -358,7 +385,7 @@ def finalize_month(
 ) -> Path:
     """Build the finalized output from the DB (canonical + latest labels) and write to checked/.
 
-    Uses the database so that manual corrections applied via review_month are included.
+    Uses the database so that corrections from the Review App are included.
     Also updates the draft in generated/ so it stays in sync.
     """
     db = db_path or DB_PATH

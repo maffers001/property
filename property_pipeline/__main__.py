@@ -5,6 +5,27 @@ import sys
 from pathlib import Path
 
 
+def _confirm_rerun(month_str: str, counts: dict) -> bool:
+    """Ask the user to type the month code before wiping existing labels."""
+    n_tx = counts.get("n_tx", 0)
+    n_reviewed = counts.get("n_reviewed", 0)
+    n_needs = counts.get("n_needs_review", 0)
+    print(
+        f"\n{month_str} is already in the database: "
+        f"{n_tx} transactions, {n_reviewed} marked reviewed, {n_needs} still need review.\n"
+        "Re-running will wipe this month's rows and labels (a snapshot is taken first).\n"
+        "Learned rules in learned_rules.json are kept.\n"
+    )
+    if not sys.stdin.isatty():
+        print("Non-interactive session: pass --yes to re-run, or abort.")
+        return False
+    try:
+        typed = input(f"Type {month_str} to confirm: ").strip()
+    except EOFError:
+        return False
+    return typed.upper() == month_str.upper()
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="property_pipeline",
@@ -20,6 +41,11 @@ def main():
     p_run.add_argument("--output-dir", help="Output directory override")
     p_run.add_argument("--use-ml", action="store_true", help="Use ML model to override catch_all / low-confidence labels")
     p_run.add_argument("--model", help="Path to ML model file (default: data/property/ml_model.joblib)")
+    p_run.add_argument(
+        "--yes", "-y",
+        action="store_true",
+        help="Re-run even if this month is already in the DB (wipes that month's labels after a snapshot)",
+    )
 
     # finalize_month
     p_fin = sub.add_parser("finalize_month", help="Copy draft to checked/")
@@ -28,7 +54,7 @@ def main():
     p_fin.add_argument("--source-dir", help="Source directory (generated/)")
 
     # review_month
-    p_rev = sub.add_parser("review_month", help="Apply review queue corrections")
+    p_rev = sub.add_parser("review_month", help="Legacy: apply corrections from review_queue xlsx if present")
     p_rev.add_argument("month", help="Month string, e.g. OCT2025")
     p_rev.add_argument("--db", help="Database path override")
 
@@ -62,14 +88,24 @@ def main():
 
     if args.command == "run_month":
         from .pipeline import run_month
-        result = run_month(
-            args.month,
+        from .db_backup import MonthAlreadyImported
+
+        run_kwargs = dict(
+            month_str=args.month,
             bank_download_dir=args.bank_dir,
             db_path=args.db,
             output_dir=args.output_dir,
             use_ml=getattr(args, "use_ml", False),
             model_path=args.model if getattr(args, "model", None) else None,
+            yes=bool(args.yes),
         )
+        try:
+            result = run_month(**run_kwargs)
+        except MonthAlreadyImported as e:
+            if not _confirm_rerun(e.month_str, e.counts):
+                print("Aborted.")
+                sys.exit(1)
+            result = run_month(**{**run_kwargs, "yes": True})
         print(f"\nDone. {result['total_transactions']} transactions, {result['needs_review']} need review.")
 
     elif args.command == "finalize_month":

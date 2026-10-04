@@ -1,11 +1,13 @@
 import { useParams, Link } from 'react-router-dom'
-import { useEffect, useState, useCallback } from 'react'
-import { getDraft, getLists, reviewAdd, reviewRemove, reviewCorrect, reviewSubmit, reviewAddByRule } from '../api'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import { getDraft, getLists, reviewAdd, reviewRemove, reviewCorrect, reviewComplete, reviewSubmit, reviewAddByRule, deleteRule } from '../api'
 import type { DraftRow, DraftColumnKey, DraftFilters } from '../types'
 import { DRAFT_COLUMN_KEYS } from '../types'
 import Filters, { DEFAULT_FILTERS } from '../components/Filters'
 import ColumnPicker from '../components/ColumnPicker'
 import DraftTable from '../components/DraftTable'
+import SaveRuleModal from '../components/SaveRuleModal'
+import BulkEditModal from '../components/BulkEditModal'
 import './Draft.css'
 
 const COLUMNS_STORAGE_KEY = 'draftColumns'
@@ -26,6 +28,52 @@ function saveVisibleColumns(cols: DraftColumnKey[]) {
   localStorage.setItem(COLUMNS_STORAGE_KEY, JSON.stringify(cols))
 }
 
+function rowSearchText(r: DraftRow) {
+  return [
+    r.Memo, r.match_text, r.counterparty, r.Description,
+    r.Account, r.Date, r.Cat, r.Subcat, r.Property, r.property_code,
+  ].map((x) => String(x ?? '')).join(' ').toLowerCase()
+}
+
+function applyDraftFilters(
+  rows: DraftRow[],
+  filters: DraftFilters,
+  lists: { property_codes: string[]; categories: string[]; subcategories: string[] } | null,
+  needsReviewOnly: boolean,
+) {
+  let out = rows
+  if (needsReviewOnly) out = out.filter((r) => r.needs_review === 1)
+  const propSel = filters.property
+  if (propSel.length && !(lists && propSel.length === lists.property_codes.length)) {
+    const allow = new Set(propSel)
+    out = out.filter((r) => allow.has(r.Property || r.property_code || ''))
+  }
+  const catSel = filters.category
+  if (catSel.length && !(lists && catSel.length === lists.categories.length)) {
+    const allow = new Set(catSel)
+    out = out.filter((r) => allow.has(r.Cat || r.category || ''))
+  }
+  const subSel = filters.subcategory
+  if (subSel.length && !(lists && subSel.length === lists.subcategories.length)) {
+    const allow = new Set(subSel)
+    out = out.filter((r) => allow.has(r.Subcat || r.subcategory || ''))
+  }
+  const q = filters.search.trim().toLowerCase()
+  if (q) out = out.filter((r) => rowSearchText(r).includes(q))
+  const from = filters.date_from
+  const to = filters.date_to
+  if (from || to) {
+    out = out.filter((r) => {
+      const d = (r.Date || '').slice(0, 10)
+      if (!d) return true
+      if (from && d < from) return false
+      if (to && d > to) return false
+      return true
+    })
+  }
+  return out
+}
+
 export default function Draft() {
   const { month } = useParams<{ month: string }>()
   const [rows, setRows] = useState<DraftRow[]>([])
@@ -38,22 +86,30 @@ export default function Draft() {
   const [submitting, setSubmitting] = useState(false)
   const [showColumnPicker, setShowColumnPicker] = useState(false)
   const [filtersCollapsed, setFiltersCollapsed] = useState(false)
+  const [ruleRow, setRuleRow] = useState<DraftRow | null>(null)
+  const [ruleMessage, setRuleMessage] = useState('')
+  const [needsReviewOnly, setNeedsReviewOnly] = useState(true)
+  const [bulkOpen, setBulkOpen] = useState(false)
+  const [undo, setUndo] = useState<{ label: string; run: () => Promise<void> } | null>(null)
+  const undoTimer = useRef<number | null>(null)
+
+  const offerUndo = useCallback((label: string, run: () => Promise<void>) => {
+    if (undoTimer.current) window.clearTimeout(undoTimer.current)
+    setUndo({ label, run })
+    undoTimer.current = window.setTimeout(() => setUndo(null), 12000)
+  }, [])
+
+  useEffect(() => () => {
+    if (undoTimer.current) window.clearTimeout(undoTimer.current)
+  }, [])
 
   const fetchDraft = useCallback(() => {
     if (!month) return
-    setLoading(true)
-    getDraft(month, {
-      property: filters.property.length ? filters.property.join(',') : undefined,
-      category: filters.category.length ? filters.category.join(',') : undefined,
-      subcategory: filters.subcategory.length ? filters.subcategory.join(',') : undefined,
-      search: filters.search.trim() || undefined,
-      date_from: filters.date_from || undefined,
-      date_to: filters.date_to || undefined,
-    })
+    getDraft(month)
       .then((data) => setRows(Array.isArray(data) ? data : []))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
-  }, [month, filters.property.join(','), filters.category.join(','), filters.subcategory.join(','), filters.search, filters.date_from, filters.date_to])
+  }, [month])
 
   useEffect(() => {
     if (!month) return
@@ -102,14 +158,22 @@ export default function Draft() {
     saveVisibleColumns(cols)
   }
 
+  const inReview = rows.filter((r) => r.needs_review === 1).length
+  const visibleRows = useMemo(
+    () => applyDraftFilters(rows, filters, lists, needsReviewOnly),
+    [rows, filters, lists, needsReviewOnly],
+  )
+  const selectedRows = useMemo(
+    () => visibleRows.filter((r) => selectedTxIds.has(r.tx_id)),
+    [visibleRows, selectedTxIds],
+  )
+  const sumAmount = visibleRows.reduce((s, r) => s + (Number(r.Amount) || 0), 0)
+  const formatSum = (n: number) =>
+    new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', minimumFractionDigits: 2 }).format(n)
+
   if (!month) return <p>Missing month</p>
   if (loading && rows.length === 0) return <p>Loading…</p>
   if (error) return <p className="error">{error}</p>
-
-  const inReview = rows.filter((r) => r.needs_review === 1).length
-  const sumAmount = rows.reduce((s, r) => s + (Number(r.Amount) || 0), 0)
-  const formatSum = (n: number) =>
-    new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', minimumFractionDigits: 2 }).format(n)
 
   return (
     <div className="draft-page">
@@ -117,14 +181,22 @@ export default function Draft() {
         <Link to="/home">Home</Link>
         <span> / </span>
         <span>{month}</span>
-        {inReview > 0 && (
-          <>
-            <span> / </span>
-            <Link to={`/review/${month}/queue`}>Review queue ({inReview})</Link>
-          </>
-        )}
       </nav>
-      <h1>Draft – {month}</h1>
+      <h1>Review – {month}</h1>
+      <p className="queue-scope">
+        {needsReviewOnly
+          ? `Showing ${visibleRows.length} of ${rows.length} rows that need review. Switch to all transactions to fix anything else.`
+          : `Showing ${visibleRows.length} of ${rows.length} transactions. ${inReview} still flagged for review.`}
+      </p>
+
+      <label className="queue-all-months">
+        <input
+          type="checkbox"
+          checked={needsReviewOnly}
+          onChange={(e) => setNeedsReviewOnly(e.target.checked)}
+        />
+        Needs review only
+      </label>
 
       <div className="draft-toolbar">
         <Filters
@@ -138,9 +210,17 @@ export default function Draft() {
       </div>
 
       <div className="draft-bulk">
-        <span>{rows.length} rows. {inReview} in review. {selectedTxIds.size} selected.</span>
+        <span>{visibleRows.length} shown. {inReview} need review. {selectedTxIds.size} selected.</span>
         <span className="draft-sum">Sum: {formatSum(sumAmount)}</span>
         <div className="draft-bulk-btns">
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => setBulkOpen(true)}
+            disabled={selectedRows.length === 0 || submitting}
+          >
+            Edit selected
+          </button>
           <button type="button" onClick={handleAddToReview} disabled={selectedTxIds.size === 0 || submitting}>
             Add selected to review
           </button>
@@ -163,27 +243,21 @@ export default function Draft() {
           </button>
           <button
             type="button"
-            onClick={async () => {
-              try {
-                const csv = await getDraft(month, {
-                  property: filters.property.length ? filters.property.join(',') : undefined,
-                  category: filters.category.length ? filters.category.join(',') : undefined,
-                  subcategory: filters.subcategory.length ? filters.subcategory.join(',') : undefined,
-                  search: filters.search.trim() || undefined,
-                  date_from: filters.date_from || undefined,
-                  date_to: filters.date_to || undefined,
-                  format: 'csv',
-                }) as string
-                const blob = new Blob([csv], { type: 'text/csv' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `draft_${month}.csv`
-                a.click()
-                URL.revokeObjectURL(url)
-              } catch (e) {
-                setError(e instanceof Error ? e.message : 'Download failed')
-              }
+            onClick={() => {
+              const cols = ['Date', 'Account', 'Amount', 'Memo', 'Property', 'Cat', 'Subcat', 'confidence', 'needs_review', 'tx_id']
+              const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
+              const header = cols.join(',')
+              const lines = visibleRows.map((r) =>
+                cols.map((c) => esc((r as Record<string, unknown>)[c])).join(','),
+              )
+              const csv = [header, ...lines].join('\n')
+              const blob = new Blob([csv], { type: 'text/csv' })
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = needsReviewOnly ? `review_${month}_needs_review.csv` : `review_${month}.csv`
+              a.click()
+              URL.revokeObjectURL(url)
             }}
           >
             Download CSV
@@ -192,21 +266,88 @@ export default function Draft() {
       </div>
 
       <DraftTable
-        rows={rows}
+        rows={visibleRows}
         visibleColumns={visibleColumns}
         selectedTxIds={selectedTxIds}
         onSelect={(ids) => setSelectedTxIds(new Set(ids))}
         onCorrect={handleCorrect}
+        onComplete={(row) => {
+          if (!month) return
+          reviewComplete(month, [row.tx_id])
+            .then(() => {
+              fetchDraft()
+              offerUndo('Marked as reviewed', async () => {
+                await reviewAdd(month, [row.tx_id])
+                fetchDraft()
+              })
+            })
+            .catch((e) => setError(e instanceof Error ? e.message : 'Failed'))
+        }}
+        onSaveRule={setRuleRow}
         lists={lists}
       />
 
       <footer className="draft-footer">
         <button type="button" className="btn-primary" onClick={handleSubmitReview} disabled={inReview === 0 || submitting}>
-          Submit review
+          Done reviewing
         </button>
-        <span>{inReview} in review</span>
+        <span>{inReview} still flagged — edit labels as needed, then Mark reviewed or Done reviewing. Then finalize the month.</span>
       </footer>
 
+      {undo && (
+        <div className="undo-bar" role="status">
+          <span>{undo.label}</span>
+          <button
+            type="button"
+            onClick={() => {
+              const action = undo
+              if (undoTimer.current) window.clearTimeout(undoTimer.current)
+              setUndo(null)
+              action.run().catch((e) => setError(e instanceof Error ? e.message : 'Undo failed'))
+            }}
+          >
+            Undo
+          </button>
+        </div>
+      )}
+      {ruleMessage && !undo && <p className="muted">{ruleMessage}</p>}
+      {ruleRow && (
+        <SaveRuleModal
+          row={ruleRow}
+          onClose={() => setRuleRow(null)}
+          onSaved={(msg, meta) => {
+            setRuleMessage(msg)
+            if (meta?.ruleIds?.length) {
+              offerUndo('Saved as rule', async () => {
+                for (const id of meta.ruleIds) {
+                  await deleteRule(id)
+                }
+                setRuleMessage('Rule save undone')
+              })
+            }
+          }}
+        />
+      )}
+      {bulkOpen && selectedRows.length > 0 && (
+        <BulkEditModal
+          rows={selectedRows}
+          lists={lists}
+          onClose={() => setBulkOpen(false)}
+          onSaved={(msg, meta) => {
+            setRuleMessage(msg)
+            setSelectedTxIds(new Set())
+            fetchDraft()
+            if (meta?.ruleIds?.length) {
+              offerUndo('Saved as rule', async () => {
+                for (const id of meta.ruleIds) {
+                  await deleteRule(id)
+                }
+                setRuleMessage('Rule save undone')
+              })
+            }
+          }}
+        />
+      )}
       {showColumnPicker && (
         <ColumnPicker
           visible={visibleColumns}

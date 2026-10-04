@@ -1,0 +1,151 @@
+.rules-page h1 {
+  margin-top: 0;
+}
+
+.rules-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.rules-toolbar label {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.rules-search {
+  min-width: 220px;
+  padding: 0.4rem 0.5rem;
+}
+
+.rules-table-wrap {
+  overflow: auto;
+}
+
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.rules-table th,
+.rules-table td {
+  text-align: left;
+  padding: 0.4rem 0.45rem;
+  border-bottom: 1px solid #333;
+  vertical-align: top;
+}
+
+.rules-table th {
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background: #161622;
+  z-index: 1;
+}
+
+.sort-th {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sort-th:hover,
+.sort-active {
+  color: #c8c8ff;
+}
+
+.rule-id {
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+  min-width: 10rem;
+  max-width: 14rem;
+  word-break: break-all;
+}
+
+.rule-edited {
+  white-space: nowrap;
+  font-size: 0.78rem;
+  color: #bbb;
+}
+
+.rule-pattern {
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+  max-width: 22rem;
+  word-break: break-word;
+}
+
+.rule-disabled {
+  opacity: 0.55;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.7rem;
+  background: #3d3d6b;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.rule-actions {
+  white-space: nowrap;
+}
+
+.rule-actions button {
+  margin-right: 0.35rem;
+  padding: 0.2rem 0.45rem;
+  cursor: pointer;
+}
+
+.rules-editor {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+}
+
+.rules-editor .rules-pattern {
+  grid-column: 1 / -1;
+}
+
+.rules-editor label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+}
+
+.rules-editor input,
+.rules-editor select {
+  padding: 0.35rem 0.45rem;
+}
+
+.rules-editor-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  padding: 0.4rem 0.8rem;
+  background: #3d3d6b;
+  color: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.settings-message {
+  color: #6a6;
+}

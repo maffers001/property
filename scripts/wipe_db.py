@@ -38,6 +38,11 @@ def main() -> None:
         print("Aborted.")
         return
 
+    from property_pipeline.db_backup import snapshot_db
+    snap = snapshot_db(DB_PATH, reason="before-wipe")
+    if snap:
+        print(f"Database snapshot: {snap}")
+
     with get_db(DB_PATH) as conn:
         conn.execute("PRAGMA foreign_keys=OFF")
         try:

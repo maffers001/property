@@ -17,8 +17,9 @@ export default function Reports() {
     getMonths().then((m) => {
       setMonths(m)
       if (m.length) {
-        setMonthFrom((prev) => prev || m[0])
-        setMonthTo((prev) => prev || m[0])
+        const latest = m[m.length - 1]
+        setMonthFrom((prev) => prev || latest)
+        setMonthTo((prev) => prev || latest)
       }
     }).catch(() => {})
   }, [])

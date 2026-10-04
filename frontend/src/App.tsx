@@ -1,17 +1,22 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from './AuthContext'
 import Layout from './Layout'
 import Login from './pages/Login'
 import Home from './pages/Home'
 import Draft from './pages/Draft'
-import Queue from './pages/Queue'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
+import Rules from './pages/Rules'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth()
   if (!isAuthenticated) return <Navigate to="/" replace />
   return <>{children}</>
+}
+
+function QueueRedirect() {
+  const { month } = useParams<{ month: string }>()
+  return <Navigate to={`/review/${month ?? ''}`} replace />
 }
 
 function AppRoutes() {
@@ -39,7 +44,7 @@ function AppRoutes() {
         path="/review/:month/queue"
         element={
           <ProtectedRoute>
-            <Layout><Queue /></Layout>
+            <QueueRedirect />
           </ProtectedRoute>
         }
       />
@@ -48,6 +53,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <Layout><Reports /></Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/rules"
+        element={
+          <ProtectedRoute>
+            <Layout><Rules /></Layout>
           </ProtectedRoute>
         }
       />

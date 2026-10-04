@@ -13,6 +13,7 @@ export interface DraftRow {
   Subcat: string
   subcategory: string
   counterparty?: string
+  match_text?: string
   posted_date?: string
   confidence?: number | null
   needs_review: number

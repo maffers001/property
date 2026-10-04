@@ -9,8 +9,11 @@ BANK_DOWNLOAD_DIR = BASE_DIR / "bank-download"
 GENERATED_DIR = BASE_DIR / "generated"
 CHECKED_DIR = BASE_DIR / "checked"
 REVIEW_DIR = BASE_DIR / "review"
+LEARNED_RULES_PATH = Path(os.environ.get("LEARNED_RULES_PATH", str(BASE_DIR / "learned_rules.json")))
 
 DB_PATH = Path(os.environ.get("DB_PATH", str(BASE_DIR / "labels.db")))
+BACKUP_DIR = Path(os.environ.get("BACKUP_DIR", str(BASE_DIR / "backups")))
+BACKUP_KEEP = int(os.environ.get("BACKUP_KEEP", "10"))
 MODEL_PATH = Path(os.environ.get("MODEL_PATH", str(BASE_DIR / "ml_model.joblib")))
 
 RSA_CAPITAL_DATE = "2022-08-01"

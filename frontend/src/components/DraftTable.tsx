@@ -6,10 +6,12 @@ type Props = {
   selectedTxIds: Set<string>
   onSelect: (txIds: string[]) => void
   onCorrect: (row: DraftRow, updates: { property_code: string; category: string; subcategory: string }) => void
+  onComplete?: (row: DraftRow) => void
+  onSaveRule?: (row: DraftRow) => void
   lists: { property_codes: string[]; categories: string[]; subcategories: string[] } | null
 }
 
-export default function DraftTable({ rows, visibleColumns, selectedTxIds, onSelect, onCorrect, lists }: Props) {
+export default function DraftTable({ rows, visibleColumns, selectedTxIds, onSelect, onCorrect, onComplete, onSaveRule, lists }: Props) {
   const toggleSelect = (txId: string) => {
     const next = new Set(selectedTxIds)
     if (next.has(txId)) next.delete(txId)
@@ -114,6 +116,8 @@ export default function DraftTable({ rows, visibleColumns, selectedTxIds, onSele
                   {key === 'needs_review' ? 'In review' : key}
                 </th>
               ))}
+              {onComplete && <th className="col-done"></th>}
+              {onSaveRule && <th className="col-rule"></th>}
             </tr>
           </thead>
           <tbody>
@@ -138,6 +142,32 @@ export default function DraftTable({ rows, visibleColumns, selectedTxIds, onSele
                     {renderCell(row, key)}
                   </td>
                 ))}
+                {onComplete && (
+                  <td className="col-done">
+                    {row.needs_review ? (
+                      <button
+                        type="button"
+                        className="btn-done"
+                        onClick={(e) => { e.stopPropagation(); onComplete(row) }}
+                        title="Keep this row’s labels and clear the needs-review flag"
+                      >
+                        Mark reviewed
+                      </button>
+                    ) : null}
+                  </td>
+                )}
+                {onSaveRule && (
+                  <td className="col-rule">
+                    <button
+                      type="button"
+                      className="btn-rule"
+                      onClick={(e) => { e.stopPropagation(); onSaveRule(row) }}
+                      title="Optional: save a regex rule so later months get the same labels"
+                    >
+                      Save as rule
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

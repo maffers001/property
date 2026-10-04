@@ -90,6 +90,11 @@ def main() -> None:
         action="store_true",
         help="Pass --use-ml to run_month when using --run",
     )
+    parser.add_argument(
+        "--yes", "-y",
+        action="store_true",
+        help="With --run, re-run months already in the DB (wipes that month's labels after a snapshot)",
+    )
     args = parser.parse_args()
 
     bank_dir = Path(args.dir) if args.dir else BANK_DOWNLOAD_DIR
@@ -131,11 +136,23 @@ def main() -> None:
 
     if args.run and sorted_months:
         from property_pipeline.pipeline import run_month
+        from property_pipeline.db_backup import MonthAlreadyImported, month_import_counts
         for month in sorted_months:
+            if not args.yes:
+                existing = month_import_counts(month)
+                if existing["n_tx"] > 0:
+                    print(
+                        f"\nSkipping {month}: already in the DB "
+                        f"({existing['n_tx']} txs, {existing['n_reviewed']} reviewed). "
+                        "Pass --yes to re-run."
+                    )
+                    continue
             print(f"\nRunning pipeline for {month}...")
-            run_month(month, use_ml=args.use_ml)
-        print("\nDone. Review queue files: data/property/review/review_queue_MMMYYYY.xlsx")
-        print("Or open the review app, then run finalize_month when review is complete.")
+            try:
+                run_month(month, use_ml=args.use_ml, yes=args.yes)
+            except MonthAlreadyImported:
+                print(f"Skipped {month} (already imported).")
+        print("\nDone. Open the Review App (http://localhost:5173), then run finalize_month when review is complete.")
     elif args.run and not sorted_months:
         print("\nNo month has all four bank files yet. Add the missing files and run again.")
 

@@ -14,7 +14,7 @@ export default function Home() {
     getMonths()
       .then((list) => {
         setMonths(list)
-        if (list.length && !selectedMonth) setSelectedMonth(list[0])
+        if (list.length && !selectedMonth) setSelectedMonth(list[list.length - 1])
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
@@ -57,15 +57,13 @@ export default function Home() {
       </div>
       <div className="home-actions">
         <Link to={`/review/${selectedMonth}`} className="home-btn home-btn-primary">
-          Review {selectedMonth}
+          Review {selectedMonth}{reviewCount > 0 ? ` (${reviewCount} need review)` : ''}
         </Link>
-        {reviewCount > 0 && (
-          <Link to={`/review/${selectedMonth}/queue`} className="home-btn home-btn-secondary">
-            Review queue ({reviewCount})
-          </Link>
-        )}
         <Link to="/reports" className="home-btn home-btn-secondary">
           Reports
+        </Link>
+        <Link to="/rules" className="home-btn home-btn-secondary">
+          Rules
         </Link>
       </div>
     </div>

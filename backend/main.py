@@ -50,8 +50,10 @@ def me(user: dict = Depends(get_current_user)):
     return {"user": user.get("sub", "user")}
 
 
-from backend.routers import draft, review_actions, reports, lists
+from backend.routers import draft, review_actions, reports, lists, rules
+
 app.include_router(draft.router)
 app.include_router(review_actions.router)
 app.include_router(reports.router)
 app.include_router(lists.router)
+app.include_router(rules.router)

@@ -6,7 +6,46 @@ from pathlib import Path
 import pandas as pd
 from dateutil.rrule import rrule, MONTHLY
 
-from .config import CHECKED_DIR
+from .config import CHECKED_DIR, DB_PATH
+
+
+_MONTH_NUM = {
+    "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
+    "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
+}
+
+
+def month_sort_key(month_str: str):
+    """JAN2026 -> (year, month) so sort is calendar, not string (APR before JAN)."""
+    s = str(month_str).strip().upper()
+    mon = _MONTH_NUM.get(s[:3], 0)
+    try:
+        year = int(s[3:])
+    except ValueError:
+        year = 0
+    return (year, mon)
+
+
+def _load_month_from_db(month_str: str) -> pd.DataFrame:
+    """Latest labels from SQLite when no checked file exists yet."""
+    from .db import get_db
+    from .export import build_output_dataframe
+    from .pipeline import _load_canonical_for_month, _load_latest_labels_for_tx_ids
+
+    needed = ["Account", "Amount", "Subcategory", "Memo", "Property", "Description", "Cat", "Subcat"]
+    empty = pd.DataFrame(columns=needed)
+    try:
+        with get_db(DB_PATH) as conn:
+            canonical = _load_canonical_for_month(conn, month_str)
+            if not canonical:
+                return empty
+            labels = _load_latest_labels_for_tx_ids(conn, [c["tx_id"] for c in canonical])
+        df = build_output_dataframe(canonical, labels)
+        if df.empty:
+            return empty
+        return df[needed]
+    except Exception:
+        return empty
 
 
 def _month_str_to_range(month_str: str) -> tuple[str, str]:
@@ -41,6 +80,10 @@ def load_data(start: str, end: str, checked_dir: Path | None = None) -> pd.DataF
         elif csv_path.exists():
             df_temp = pd.read_csv(csv_path, index_col=0, parse_dates=True, dayfirst=True)
         else:
+            df_temp = _load_month_from_db(date_str)
+            if df_temp.empty:
+                continue
+            df_all = pd.concat([df_all, df_temp])
             continue
         df_temp.index = pd.to_datetime(df_temp.index, dayfirst=True, errors="coerce")
         df_temp = df_temp.dropna(how="all", subset=df_temp.columns)

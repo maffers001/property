@@ -12,6 +12,26 @@ import pandas as pd
 from .config import STARLING_ACCOUNT
 
 
+def month_posted_date_bounds(month_str: str) -> tuple[str, str]:
+    """Inclusive YYYY-MM-DD range for a month key like JAN2026."""
+    dt = pd.to_datetime("01" + month_str, format="%d%b%Y")
+    start = dt.strftime("%Y-%m-%d")
+    end = (dt + pd.offsets.MonthEnd(0)).strftime("%Y-%m-%d")
+    return start, end
+
+CSV_ENCODINGS = ("utf-8", "utf-8-sig", "cp1252", "latin-1")
+
+
+def read_csv_encoded(filepath: Path, **kwargs) -> pd.DataFrame:
+    """Read a CSV trying UTF-8 then common Windows encodings (Starling exports)."""
+    for encoding in CSV_ENCODINGS:
+        try:
+            return pd.read_csv(filepath, encoding=encoding, **kwargs)
+        except UnicodeDecodeError:
+            continue
+    return pd.read_csv(filepath, encoding="latin-1", encoding_errors="replace", **kwargs)
+
+
 def _compute_tx_id(
     source_bank: str,
     source_account: str,
@@ -51,7 +71,7 @@ def load_barclays(filepath: str | Path, import_batch_id: str) -> tuple[list[dict
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", pd.errors.ParserWarning)
         try:
-            df = pd.read_csv(
+            df = read_csv_encoded(
                 filepath,
                 names=["Number", "Date", "Account", "Amount", "Subcategory", "Memo"],
                 skiprows=1,
@@ -63,9 +83,9 @@ def load_barclays(filepath: str | Path, import_batch_id: str) -> tuple[list[dict
     if df is None:
         # Variable columns (e.g. extra comma in Memo) - use python engine, take first 6
         try:
-            df = pd.read_csv(filepath, skiprows=1, dtype=str, engine="python", on_bad_lines="warn")
+            df = read_csv_encoded(filepath, skiprows=1, dtype=str, engine="python", on_bad_lines="warn")
         except TypeError:
-            df = pd.read_csv(filepath, skiprows=1, dtype=str, engine="python")
+            df = read_csv_encoded(filepath, skiprows=1, dtype=str, engine="python")
         ncol = min(6, df.shape[1])
         df = df.iloc[:, :ncol].copy()
         df.columns = ["Number", "Date", "Account", "Amount", "Subcategory", "Memo"][:ncol]
@@ -165,14 +185,7 @@ def load_starling(filepath: str | Path, import_batch_id: str) -> tuple[list[dict
     filepath = Path(filepath)
     source_file = filepath.name
 
-    for encoding in ["utf-8", "utf-8-sig", "cp1252", "latin-1"]:
-        try:
-            df = pd.read_csv(filepath, dtype=str, encoding=encoding)
-            break
-        except (UnicodeDecodeError, UnicodeError):
-            continue
-    else:
-        df = pd.read_csv(filepath, dtype=str, encoding="latin-1", errors="replace")
+    df = read_csv_encoded(filepath, dtype=str)
 
     df = df.fillna("")
     for c in df.columns:
@@ -275,6 +288,7 @@ def load_month_files(bank_download_dir: Path, month_str: str, import_batch_id: s
 
     dt = pd.to_datetime("01" + month_str, format="%d%b%Y")
     starling_date_str = dt.strftime("%Y-%m")
+    start, end = month_posted_date_bounds(month_str)
 
     barclays_files = [
         bank_download_dir / f"BC_6045_{month_str}.csv",
@@ -301,5 +315,13 @@ def load_month_files(bank_download_dir: Path, month_str: str, import_batch_id: s
     else:
         print(f"Warning: missing Starling file {starling_file}")
 
+    def in_month(row: dict) -> bool:
+        d = str(row.get("posted_date") or "")[:10]
+        return bool(d) and start <= d <= end
+
+    skipped = sum(1 for r in all_canonical if not in_month(r))
+    if skipped:
+        print(f"Skipped {skipped} row(s) dated outside {start}..{end}")
+    all_canonical = [r for r in all_canonical if in_month(r)]
     all_canonical.sort(key=lambda r: r["posted_date"])
     return all_raw, all_canonical

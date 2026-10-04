@@ -17,21 +17,26 @@ def _load_latest_labels_with_meta(conn, tx_ids: list[str]) -> list[dict]:
     """Load latest label per tx_id including confidence, needs_review, rule_strength, reviewed_at."""
     if not tx_ids:
         return []
-    placeholders = ",".join(["?"] * len(tx_ids))
-    cursor = conn.execute(
-        f"""
-        SELECT l.tx_id, l.property_code, l.category, l.subcategory,
-               l.confidence, l.needs_review, l.rule_strength, l.reviewed_at
-        FROM transactions_labels l
-        INNER JOIN (
-            SELECT tx_id, MAX(label_version) AS mv FROM transactions_labels
-            WHERE tx_id IN ({placeholders}) GROUP BY tx_id
-        ) m ON l.tx_id = m.tx_id AND l.label_version = m.mv
-        WHERE l.tx_id IN ({placeholders})
-        """,
-        tx_ids + tx_ids,
-    )
-    return [dict(row) for row in cursor.fetchall()]
+    out: list[dict] = []
+    chunk_size = 400
+    for i in range(0, len(tx_ids), chunk_size):
+        chunk = tx_ids[i:i + chunk_size]
+        placeholders = ",".join(["?"] * len(chunk))
+        cursor = conn.execute(
+            f"""
+            SELECT l.tx_id, l.property_code, l.category, l.subcategory,
+                   l.confidence, l.needs_review, l.rule_strength, l.reviewed_at
+            FROM transactions_labels l
+            INNER JOIN (
+                SELECT tx_id, MAX(label_version) AS mv FROM transactions_labels
+                WHERE tx_id IN ({placeholders}) GROUP BY tx_id
+            ) m ON l.tx_id = m.tx_id AND l.label_version = m.mv
+            WHERE l.tx_id IN ({placeholders})
+            """,
+            chunk + chunk,
+        )
+        out.extend(dict(row) for row in cursor.fetchall())
+    return out
 
 
 def _apply_filters(rows: list[dict], properties: list[str], categories: list[str],
@@ -50,10 +55,16 @@ def _apply_filters(rows: list[dict], properties: list[str], categories: list[str
         rows = [r for r in rows if r.get("needs_review") == 1]
     if search and search.strip():
         q = search.strip().lower()
-        rows = [
-            r for r in rows
-            if q in (r.get("memo") or "").lower() or q in (r.get("counterparty") or "").lower()
-        ]
+        def hit(r):
+            blob = " ".join(
+                str(r.get(k) or "")
+                for k in (
+                    "Memo", "memo", "match_text", "counterparty", "Description",
+                    "Account", "Date", "Cat", "Subcat", "Property", "property_code",
+                )
+            ).lower()
+            return q in blob
+        rows = [r for r in rows if hit(r)]
     if date_from or date_to:
         def parse_d(s):
             if not s:
@@ -125,6 +136,7 @@ def _canonical_and_labels_to_rows(canonical: list[dict], labels: list[dict]) -> 
             "Amount": amount_float,
             "Subcategory": _get(c, "effective_subcategory"),
             "Memo": _get(c, "memo"),
+            "match_text": _get(c, "match_text"),
             "Property": _get(lab, "property_code"),
             "property_code": _get(lab, "property_code"),
             "Description": _get(c, "description"),
@@ -145,9 +157,11 @@ def _canonical_and_labels_to_rows(canonical: list[dict], labels: list[dict]) -> 
 def get_months(user: dict = Depends(get_current_user)):
     with get_db(DB_PATH) as conn:
         cursor = conn.execute(
-            "SELECT DISTINCT import_batch_id FROM transactions_canonical ORDER BY import_batch_id DESC"
+            "SELECT DISTINCT import_batch_id FROM transactions_canonical"
         )
         months = [row["import_batch_id"] for row in cursor.fetchall()]
+    from property_pipeline.report_summary import month_sort_key
+    months.sort(key=month_sort_key)
     return months
 
 
@@ -155,6 +169,7 @@ def get_months(user: dict = Depends(get_current_user)):
 def get_lists(user: dict = Depends(get_current_user)):
     categories, subcategories = get_categories_and_subcategories()
     with get_db(DB_PATH) as conn:
+        conn.execute("DELETE FROM properties WHERE property_code = 'ALL'")
         cursor = conn.execute("SELECT property_code FROM properties ORDER BY property_code")
         property_codes = [row["property_code"] for row in cursor.fetchall()]
         cursor = conn.execute(
@@ -219,6 +234,7 @@ def get_review(
     date_from: str | None = Query(None),
     date_to: str | None = Query(None),
     format: str | None = Query(None),
+    all_months: bool = Query(False, alias="all"),
     user: dict = Depends(get_current_user),
 ):
     properties = [p.strip() for p in (property_codes or "").split(",") if p.strip()]
@@ -226,7 +242,15 @@ def get_review(
     subcategories = [s.strip() for s in (subcategory or "").split(",") if s.strip()]
 
     with get_db(DB_PATH) as conn:
-        canonical = _load_canonical_for_month(conn, month)
+        if all_months:
+            canonical = conn.execute(
+                """SELECT * FROM transactions_canonical
+                   WHERE is_superseded = 0
+                   ORDER BY posted_date, tx_id"""
+            )
+            canonical = [dict(row) for row in canonical.fetchall()]
+        else:
+            canonical = _load_canonical_for_month(conn, month)
     if not canonical:
         return [] if format != "csv" else _empty_csv_response()
 
