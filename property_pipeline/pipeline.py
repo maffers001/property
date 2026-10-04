@@ -2,7 +2,6 @@
 
 import json
 import sqlite3
-import shutil
 import time
 from pathlib import Path
 
@@ -21,13 +20,26 @@ from .rules_seed import get_all_rules, get_categories_and_subcategories, PROPERT
 from .learned_rules import load_learned_rules
 
 
-def _backup_if_exists(filepath: Path) -> None:
-    """If file exists, copy it to a timestamped backup (e.g. file.xlsx.bak_20250218-143022)."""
-    if not filepath.exists():
-        return
+def _backup_if_exists(filepath: Path) -> Path | None:
+    """If file exists, rename it to name_bak_YYYYmmdd-HHMMSS.ext before overwrite."""
+    filepath = Path(filepath)
+    if not filepath.is_file():
+        return None
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    backup_path = Path(str(filepath) + f".bak_{timestr}")
-    shutil.copy2(filepath, backup_path)
+    backup_path = filepath.with_name(f"{filepath.stem}_bak_{timestr}{filepath.suffix}")
+    n = 1
+    while backup_path.exists():
+        backup_path = filepath.with_name(f"{filepath.stem}_bak_{timestr}_{n}{filepath.suffix}")
+        n += 1
+    try:
+        filepath.replace(backup_path)
+    except OSError as e:
+        raise OSError(
+            f"Could not move {filepath.name} aside as {backup_path.name}. "
+            "Close the file in Excel if it is open, then retry."
+        ) from e
+    print(f"Kept previous file as {backup_path}")
+    return backup_path
 
 
 def seed_db(db_path: Path | str | None = None) -> None:

@@ -83,7 +83,7 @@ So backtest never opens `labels.db`. It only needs bank files + checked XLSX. Th
 
 ## Backups
 
-Before overwriting any output file, the pipeline creates a timestamped backup (e.g. `OCT2025_codedAndCategorised.xlsx.bak_20250218-143022`). This applies to files written in `generated/`, `review/`, and when running `finalize_month` to `checked/`.
+Before overwriting any output file, the pipeline **renames** the existing file to a timestamped backup (e.g. `OCT2025_codedAndCategorised_bak_20250218-143022.xlsx`). This applies to files written in `generated/` and when running `finalize_month` to `checked/`. Close the workbook in Excel first if Windows cannot rename it.
 
 Before `run_month` clears a month (and before `scripts/wipe_db.py` empties the DB), a consistent copy of `labels.db` is written to `data/property/backups/` via SQLite backup, plus `learned_rules.json` if it exists. The last 10 snapshots are kept (`BACKUP_KEEP`). Restore by stopping the Review App, copying a snapshot over `labels.db`, and copying the matching `.learned_rules.json` over `learned_rules.json` if needed. Step-by-step: **`documentation/BACKUP.md`**. Monthly steps: **`documentation/PROCESS.md`**.
 

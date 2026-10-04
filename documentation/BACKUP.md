@@ -76,4 +76,4 @@ If a `labels.db-wal` or `labels.db-shm` is left over from the old session, delet
 
 - Do **not** re-run `run_month` for a month you have already reviewed unless you mean to wipe that month’s labels. You will be asked to type the month code; a snapshot is taken if you proceed.
 - Do **not** run `python scripts/wipe_db.py` unless you intend to empty the whole database (it snapshots first).
-- After review, run `python -m property_pipeline finalize_month MMMYYYY` so `checked/MMMYYYY_codedAndCategorised.xlsx` exists. That spreadsheet is the durable monthly deliverable even if the DB is later replaced.
+- After review, run `python -m property_pipeline finalize_month MMMYYYY` so `checked/MMMYYYY_codedAndCategorised.xlsx` exists. That spreadsheet is the durable monthly deliverable even if the DB is later replaced. If that file (or the matching csv) already exists, it is **renamed** first to `MMMYYYY_codedAndCategorised_bak_YYYYmmdd-HHMMSS.xlsx` (close it in Excel if rename fails).
