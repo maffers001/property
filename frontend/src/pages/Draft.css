@@ -263,6 +263,15 @@
   background: rgba(160, 80, 80, 0.15);
 }
 
+/* Edited while filtered; no longer matches filter — keep visible for Save as rule */
+.draft-table tbody tr.filter-held {
+  background: #3a3a48;
+}
+
+.draft-table tbody tr.filter-held:hover {
+  background: #454556;
+}
+
 .draft-cell-select {
   width: 100%;
   min-width: 0;

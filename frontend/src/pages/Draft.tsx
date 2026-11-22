@@ -85,18 +85,28 @@ export default function Draft() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [showColumnPicker, setShowColumnPicker] = useState(false)
-  const [filtersCollapsed, setFiltersCollapsed] = useState(false)
+  const [filtersCollapsed, setFiltersCollapsed] = useState(true)
   const [ruleRow, setRuleRow] = useState<DraftRow | null>(null)
   const [ruleMessage, setRuleMessage] = useState('')
   const [needsReviewOnly, setNeedsReviewOnly] = useState(true)
   const [bulkOpen, setBulkOpen] = useState(false)
   const [undo, setUndo] = useState<{ label: string; run: () => Promise<void> } | null>(null)
+  const [pinnedTxIds, setPinnedTxIds] = useState<Set<string>>(new Set())
   const undoTimer = useRef<number | null>(null)
 
   const offerUndo = useCallback((label: string, run: () => Promise<void>) => {
     if (undoTimer.current) window.clearTimeout(undoTimer.current)
     setUndo({ label, run })
     undoTimer.current = window.setTimeout(() => setUndo(null), 12000)
+  }, [])
+
+  const pinRows = useCallback((txIds: string[]) => {
+    if (!txIds.length) return
+    setPinnedTxIds((prev) => {
+      const next = new Set(prev)
+      for (const id of txIds) next.add(id)
+      return next
+    })
   }, [])
 
   useEffect(() => () => {
@@ -120,7 +130,28 @@ export default function Draft() {
     fetchDraft()
   }, [fetchDraft])
 
+  // Changing filters clears held rows; otherwise edited rows stay pinned under the old filter.
+  useEffect(() => {
+    setPinnedTxIds(new Set())
+  }, [filters, needsReviewOnly, month])
+
   const handleCorrect = (row: DraftRow, updates: { property_code: string; category: string; subcategory: string }) => {
+    pinRows([row.tx_id])
+    setRows((prev) =>
+      prev.map((r) =>
+        r.tx_id === row.tx_id
+          ? {
+              ...r,
+              property_code: updates.property_code,
+              Property: updates.property_code,
+              category: updates.category,
+              Cat: updates.category,
+              subcategory: updates.subcategory,
+              Subcat: updates.subcategory,
+            }
+          : r,
+      ),
+    )
     reviewCorrect(row.tx_id, updates.property_code, updates.category, updates.subcategory)
       .then(() => fetchDraft())
       .catch((e) => setError(e.message))
@@ -159,10 +190,22 @@ export default function Draft() {
   }
 
   const inReview = rows.filter((r) => r.needs_review === 1).length
-  const visibleRows = useMemo(
+  const filteredRows = useMemo(
     () => applyDraftFilters(rows, filters, lists, needsReviewOnly),
     [rows, filters, lists, needsReviewOnly],
   )
+  const filteredTxIds = useMemo(() => new Set(filteredRows.map((r) => r.tx_id)), [filteredRows])
+  const heldTxIds = useMemo(() => {
+    const held = new Set<string>()
+    for (const id of pinnedTxIds) {
+      if (!filteredTxIds.has(id)) held.add(id)
+    }
+    return held
+  }, [pinnedTxIds, filteredTxIds])
+  const visibleRows = useMemo(() => {
+    if (heldTxIds.size === 0) return filteredRows
+    return rows.filter((r) => filteredTxIds.has(r.tx_id) || heldTxIds.has(r.tx_id))
+  }, [rows, filteredRows, filteredTxIds, heldTxIds])
   const selectedRows = useMemo(
     () => visibleRows.filter((r) => selectedTxIds.has(r.tx_id)),
     [visibleRows, selectedTxIds],
@@ -269,10 +312,12 @@ export default function Draft() {
         rows={visibleRows}
         visibleColumns={visibleColumns}
         selectedTxIds={selectedTxIds}
+        heldTxIds={heldTxIds}
         onSelect={(ids) => setSelectedTxIds(new Set(ids))}
         onCorrect={handleCorrect}
         onComplete={(row) => {
           if (!month) return
+          pinRows([row.tx_id])
           reviewComplete(month, [row.tx_id])
             .then(() => {
               fetchDraft()
@@ -335,6 +380,7 @@ export default function Draft() {
           onClose={() => setBulkOpen(false)}
           onSaved={(msg, meta) => {
             setRuleMessage(msg)
+            pinRows(selectedRows.map((r) => r.tx_id))
             setSelectedTxIds(new Set())
             fetchDraft()
             if (meta?.ruleIds?.length) {

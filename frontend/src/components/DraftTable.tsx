@@ -4,6 +4,8 @@ type Props = {
   rows: DraftRow[]
   visibleColumns: DraftColumnKey[]
   selectedTxIds: Set<string>
+  /** Rows edited out of the current filter; stay visible and grey until filters change. */
+  heldTxIds?: Set<string>
   onSelect: (txIds: string[]) => void
   onCorrect: (row: DraftRow, updates: { property_code: string; category: string; subcategory: string }) => void
   onComplete?: (row: DraftRow) => void
@@ -11,7 +13,7 @@ type Props = {
   lists: { property_codes: string[]; categories: string[]; subcategories: string[] } | null
 }
 
-export default function DraftTable({ rows, visibleColumns, selectedTxIds, onSelect, onCorrect, onComplete, onSaveRule, lists }: Props) {
+export default function DraftTable({ rows, visibleColumns, selectedTxIds, heldTxIds, onSelect, onCorrect, onComplete, onSaveRule, lists }: Props) {
   const toggleSelect = (txId: string) => {
     const next = new Set(selectedTxIds)
     if (next.has(txId)) next.delete(txId)
@@ -125,6 +127,7 @@ export default function DraftTable({ rows, visibleColumns, selectedTxIds, onSele
               <tr
                 key={row.tx_id}
                 className={[
+                  heldTxIds?.has(row.tx_id) ? 'filter-held' : '',
                   row.needs_review ? 'in-review' : '',
                   (row.confidence != null && row.confidence < 0.85) || row.rule_strength === 'catch_all' ? 'best-guess' : '',
                   ['OurRent', 'Mortgage', 'PropertyExpense', 'BealsRent'].includes(row.Cat || row.category || '') && !(row.Property || row.property_code || '').trim() ? 'unusual' : '',

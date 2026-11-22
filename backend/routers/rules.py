@@ -49,6 +49,7 @@ class FromReviewBody(BaseModel):
     pattern: str | None = None
     phase: str | None = None
     strength: str = "strong"
+    order_index: int | None = None
     exclude_tx_id: str = ""
     exclude_tx_ids: list[str] = []
     samples: list[str] = []
@@ -201,6 +202,235 @@ def _validate_pattern(pattern: str) -> None:
         raise HTTPException(status_code=400, detail=f"Invalid regex: {e}") from e
 
 
+def _sample_text(body: FromReviewBody) -> str:
+    return (body.match_text or body.memo or body.counterparty or "").strip()
+
+
+def _rule_matches_text(pattern: str, text: str) -> bool:
+    if not pattern or not text:
+        return False
+    if pattern.startswith("__"):
+        return False
+    try:
+        return bool(re.match(pattern, text, re.IGNORECASE))
+    except re.error:
+        return False
+
+
+def _outputs_conflict(outs: dict, property_code: str, category: str, subcategory: str) -> bool:
+    return (
+        _label_conflict(outs.get("property_code") or "", property_code)
+        or _label_conflict(outs.get("category") or "", category)
+        or _label_conflict(outs.get("subcategory") or "", subcategory)
+    )
+
+
+def _competing_rules_preview(
+    text: str,
+    *,
+    phase: str,
+    property_code: str = "",
+    category: str = "",
+    subcategory: str = "",
+    proposed_order: int | None = None,
+) -> dict:
+    """Other enabled rules that match the same transaction text.
+
+    Override phase: later order_index wins (last writer).
+    Other phases: earlier order_index wins (first match).
+    """
+    text = (text or "").strip()
+    phase = (phase or "override").strip() or "override"
+    if not text:
+        return {
+            "competing_rules": [],
+            "competing_count": 0,
+            "conflict_rule_count": 0,
+            "suggested_order_index": -1 if proposed_order is None else proposed_order,
+            "priority_note": "",
+            "would_win": True,
+        }
+
+    learned = _learned_by_id()
+    with get_db(DB_PATH) as conn:
+        rows = conn.execute(
+            "SELECT * FROM rules WHERE enabled=1 ORDER BY phase, order_index, rule_id"
+        ).fetchall()
+
+    competing: list[dict] = []
+    for raw in rows:
+        row = dict(raw)
+        if not _rule_matches_text(row.get("pattern") or "", text):
+            continue
+        api = _to_api(row, learned)
+        outs = _outputs_from_row(row)
+        conflict = _outputs_conflict(outs, property_code, category, subcategory)
+        same_phase = (row.get("phase") or "") == phase
+        competing.append(
+            {
+                **api,
+                "conflict": conflict,
+                "same_phase": same_phase,
+            }
+        )
+
+    same_phase_conflicts = [
+        c for c in competing if c.get("same_phase") and c.get("conflict")
+    ]
+    order = -1 if proposed_order is None else int(proposed_order)
+
+    if phase == "override":
+        # Last matching override wins for cat/subcat.
+        beat = max((int(c["order_index"]) for c in same_phase_conflicts), default=None)
+        suggested = (beat + 1) if beat is not None else -1
+        check_order = suggested if proposed_order is None else order
+        later_conflicts = [c for c in same_phase_conflicts if int(c["order_index"]) >= check_order]
+        would_win = len(later_conflicts) == 0
+        if beat is not None and check_order <= beat:
+            priority_note = (
+                f"{len(same_phase_conflicts)} other override rule(s) also match and set different "
+                f"labels. They run at/after order {check_order} and would overwrite yours. "
+                f"Use order {suggested} (or higher) so yours runs last."
+            )
+        elif same_phase_conflicts:
+            priority_note = (
+                f"Yours would win over {len(same_phase_conflicts)} conflicting override rule(s) "
+                f"at order {check_order}."
+            )
+        else:
+            priority_note = "No other override rules match this text with different labels."
+    else:
+        # First match wins within the phase.
+        beat = min((int(c["order_index"]) for c in same_phase_conflicts), default=None)
+        suggested = (beat - 1) if beat is not None else -1
+        check_order = suggested if proposed_order is None else order
+        earlier_conflicts = [c for c in same_phase_conflicts if int(c["order_index"]) <= check_order]
+        would_win = len(earlier_conflicts) == 0
+        if beat is not None and check_order >= beat:
+            priority_note = (
+                f"{len(same_phase_conflicts)} other {phase} rule(s) also match and set different "
+                f"labels. An earlier rule would win. Use order {suggested} (or lower) so yours runs first."
+            )
+        elif same_phase_conflicts:
+            priority_note = (
+                f"Yours would win over {len(same_phase_conflicts)} conflicting {phase} rule(s) "
+                f"at order {check_order}."
+            )
+        else:
+            priority_note = f"No other {phase} rules match this text with different labels."
+
+    return {
+        "competing_rules": competing[:40],
+        "competing_count": len(competing),
+        "conflict_rule_count": len(same_phase_conflicts),
+        "suggested_order_index": suggested,
+        "priority_note": priority_note,
+        "would_win": would_win,
+    }
+
+
+def _phase_outputs_conflict(a: dict, b: dict) -> bool:
+    """True if two matching rules disagree on any non-empty label they both set."""
+    for key in ("property_code", "category", "subcategory"):
+        av = (a.get(key) or "").strip()
+        bv = (b.get(key) or "").strip()
+        if av and bv and av != bv:
+            return True
+    return False
+
+
+def _match_text_preview(text: str) -> dict:
+    """All enabled rules that match text, with per-phase winner and conflict flags."""
+    text = (text or "").strip()
+    if not text:
+        return {
+            "match_text": "",
+            "matches": [],
+            "match_count": 0,
+            "winners": {},
+            "note": "Enter transaction match text to see which rules fire.",
+        }
+
+    learned = _learned_by_id()
+    with get_db(DB_PATH) as conn:
+        rows = conn.execute(
+            "SELECT * FROM rules WHERE enabled=1 ORDER BY phase, order_index, rule_id"
+        ).fetchall()
+
+    matches: list[dict] = []
+    by_phase: dict[str, list[dict]] = {}
+    for raw in rows:
+        row = dict(raw)
+        if not _rule_matches_text(row.get("pattern") or "", text):
+            continue
+        api = _to_api(row, learned)
+        matches.append(api)
+        by_phase.setdefault(api["phase"] or "", []).append(api)
+
+    winners: dict[str, str | None] = {}
+    conflict_ids: set[str] = set()
+    for phase, group in by_phase.items():
+        if not group:
+            winners[phase] = None
+            continue
+        if phase == "override":
+            # Last matching override wins (highest order_index, then rule_id).
+            winner = max(group, key=lambda r: (int(r["order_index"]), r["rule_id"]))
+        else:
+            # First match wins (lowest order_index, then rule_id).
+            winner = min(group, key=lambda r: (int(r["order_index"]), r["rule_id"]))
+        winners[phase] = winner["rule_id"]
+        for i, a in enumerate(group):
+            for b in group[i + 1 :]:
+                if _phase_outputs_conflict(a, b):
+                    conflict_ids.add(a["rule_id"])
+                    conflict_ids.add(b["rule_id"])
+
+    for m in matches:
+        m["wins_phase"] = winners.get(m["phase"]) == m["rule_id"]
+        m["phase_conflict"] = m["rule_id"] in conflict_ids
+
+    phase_notes = []
+    for phase in ("property", "category", "subcategory", "override"):
+        group = by_phase.get(phase) or []
+        if not group:
+            continue
+        wid = winners.get(phase)
+        win = next((g for g in group if g["rule_id"] == wid), None)
+        conflicts = [g for g in group if g["rule_id"] in conflict_ids]
+        if conflicts and win:
+            outs = " / ".join(
+                x for x in (win.get("property_code"), win.get("category"), win.get("subcategory")) if x
+            ) or "—"
+            how = "last (highest order)" if phase == "override" else "first (lowest order)"
+            phase_notes.append(
+                f"{phase}: {len(group)} match; winner {win['rule_id']} → {outs} ({how}). "
+                f"{len(conflicts)} disagree on labels."
+            )
+        elif win:
+            outs = " / ".join(
+                x for x in (win.get("property_code"), win.get("category"), win.get("subcategory")) if x
+            ) or "—"
+            phase_notes.append(f"{phase}: winner {win['rule_id']} → {outs}.")
+
+    return {
+        "match_text": text,
+        "matches": matches,
+        "match_count": len(matches),
+        "winners": winners,
+        "note": " ".join(phase_notes) if phase_notes else "No enabled rules match this text.",
+    }
+
+
+class MatchTextBody(BaseModel):
+    match_text: str = ""
+
+
+@router.post("/rules/match-text")
+def rules_match_text(body: MatchTextBody, user: dict = Depends(get_current_user)):
+    return _match_text_preview(body.match_text or "")
+
+
 @router.get("/rules")
 def list_rules(user: dict = Depends(get_current_user)):
     with get_db(DB_PATH) as conn:
@@ -337,6 +567,30 @@ def rules_from_review(body: FromReviewBody, user: dict = Depends(get_current_use
             phase = "property"
         else:
             phase = "override"
+    cat_phase = phase if phase != "property" else "override"
+    # Default order so new override rules beat conflicting seed overrides (last writer wins).
+    order = body.order_index
+    if order is None:
+        advice = _competing_rules_preview(
+            _sample_text(body),
+            phase=cat_phase if ((body.category or "").strip() or (body.subcategory or "").strip()) else "property",
+            property_code=body.property_code,
+            category=body.category,
+            subcategory=body.subcategory,
+            proposed_order=None,
+        )
+        order = int(advice.get("suggested_order_index", -1))
+    prop_order = -1
+    if (body.property_code or "").strip():
+        prop_advice = _competing_rules_preview(
+            _sample_text(body),
+            phase="property",
+            property_code=body.property_code,
+            category="",
+            subcategory="",
+            proposed_order=None,
+        )
+        prop_order = int(prop_advice.get("suggested_order_index", -1))
     created: list[dict] = []
     # Property pass only reads property_code; override reads cat/subcat
     if (body.property_code or "").strip():
@@ -345,7 +599,7 @@ def rules_from_review(body: FromReviewBody, user: dict = Depends(get_current_use
             pattern=pattern,
             property_code=body.property_code,
             strength=body.strength,
-            order_index=-1,
+            order_index=prop_order,
         )
         upsert_learned_rule(rule)
         with get_db(DB_PATH) as conn:
@@ -353,12 +607,12 @@ def rules_from_review(body: FromReviewBody, user: dict = Depends(get_current_use
         created.append(rule)
     if (body.category or "").strip() or (body.subcategory or "").strip():
         rule = rule_row_from_fields(
-            phase=phase if phase != "property" else "override",
+            phase=cat_phase,
             pattern=pattern,
             category=body.category,
             subcategory=body.subcategory,
             strength=body.strength,
-            order_index=-1,
+            order_index=order,
         )
         upsert_learned_rule(rule)
         with get_db(DB_PATH) as conn:
@@ -381,6 +635,11 @@ def rules_test_pattern(body: FromReviewBody, user: dict = Depends(get_current_us
         memo=body.memo,
         counterparty=body.counterparty,
         match_text=body.match_text,
+    )
+    phase = body.phase or (
+        "property"
+        if (body.property_code or "").strip() and not (body.category or body.subcategory)
+        else "override"
     )
     if result.get("ok") and (body.pattern or "").strip():
         preview = _preview_other_matches(
@@ -417,6 +676,19 @@ def rules_test_pattern(body: FromReviewBody, user: dict = Depends(get_current_us
         result["other_count"] = 0
         result["conflict_count"] = 0
         result["others"] = []
+
+    # Competing rules that match the same transaction text (priority / overwrite risk).
+    sample = result.get("sample") or _sample_text(body)
+    result.update(
+        _competing_rules_preview(
+            sample,
+            phase=phase,
+            property_code=body.property_code,
+            category=body.category,
+            subcategory=body.subcategory,
+            proposed_order=body.order_index,
+        )
+    )
     return result
 
 

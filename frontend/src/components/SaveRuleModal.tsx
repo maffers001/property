@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { saveRuleFromReview, suggestRulePattern, testRulePattern, reviewCorrectBulk } from '../api'
+import type { CompetingRule } from '../api'
 import type { DraftRow } from '../types'
 import './SaveRuleModal.css'
 
@@ -27,6 +28,11 @@ function money(n: number) {
   return Number(n).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
+function outsLabel(r: CompetingRule) {
+  const parts = [r.property_code, r.category, r.subcategory].filter(Boolean)
+  return parts.length ? parts.join(' / ') : '—'
+}
+
 export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
   const property = row.Property ?? row.property_code ?? ''
   const category = row.Cat ?? row.category ?? ''
@@ -36,6 +42,8 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
   const [prop, setProp] = useState(property)
   const [cat, setCat] = useState(category)
   const [sub, setSub] = useState(subcategory)
+  const [orderIndex, setOrderIndex] = useState(-1)
+  const [orderTouched, setOrderTouched] = useState(false)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [sample, setSample] = useState(row.match_text || row.counterparty || row.Memo || '')
@@ -46,6 +54,11 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
   const [otherCount, setOtherCount] = useState(0)
   const [conflictCount, setConflictCount] = useState(0)
   const [applyAllMatches, setApplyAllMatches] = useState(true)
+  const [competing, setCompeting] = useState<CompetingRule[]>([])
+  const [conflictRuleCount, setConflictRuleCount] = useState(0)
+  const [suggestedOrder, setSuggestedOrder] = useState(-1)
+  const [priorityNote, setPriorityNote] = useState('')
+  const [wouldWin, setWouldWin] = useState(true)
 
   useEffect(() => {
     suggestRulePattern(row.Memo || '', row.counterparty, row.match_text)
@@ -63,6 +76,7 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
       setOthers([])
       setOtherCount(0)
       setConflictCount(0)
+      setCompeting([])
       return
     }
     let cancelled = false
@@ -77,6 +91,8 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
         property_code: prop,
         category: cat,
         subcategory: sub,
+        phase,
+        order_index: orderTouched ? orderIndex : undefined,
       })
         .then((res) => {
           if (cancelled) return
@@ -86,6 +102,14 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
           setOthers(res.others || [])
           setOtherCount(res.other_count ?? 0)
           setConflictCount(res.conflict_count ?? 0)
+          setCompeting(res.competing_rules || [])
+          setConflictRuleCount(res.conflict_rule_count ?? 0)
+          setSuggestedOrder(res.suggested_order_index ?? -1)
+          setPriorityNote(res.priority_note || '')
+          setWouldWin(res.would_win !== false)
+          if (!orderTouched && res.suggested_order_index != null) {
+            setOrderIndex(res.suggested_order_index)
+          }
         })
         .catch((e) => {
           if (cancelled) return
@@ -94,6 +118,7 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
           setOthers([])
           setOtherCount(0)
           setConflictCount(0)
+          setCompeting([])
         })
         .finally(() => {
           if (!cancelled) setTesting(false)
@@ -103,7 +128,18 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
       cancelled = true
       window.clearTimeout(t)
     }
-  }, [pattern, row, prop, cat, sub])
+  }, [pattern, row, prop, cat, sub, phase, orderIndex, orderTouched])
+
+  const bumpAbove = (r: CompetingRule) => {
+    setOrderTouched(true)
+    if (phase === 'override') setOrderIndex(Number(r.order_index) + 1)
+    else setOrderIndex(Number(r.order_index) - 1)
+  }
+
+  const useSuggested = () => {
+    setOrderTouched(true)
+    setOrderIndex(suggestedOrder)
+  }
 
   const handleSave = async () => {
     setError('')
@@ -135,8 +171,9 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
         pattern: pattern.trim(),
         phase,
         strength: 'strong',
+        order_index: orderIndex,
       })
-      let msg = `Saved ${res.rules.length} rule(s) with pattern ${res.pattern}`
+      let msg = `Saved ${res.rules.length} rule(s) with pattern ${res.pattern} (order ${orderIndex})`
       if (applyAllMatches) {
         const applied = await reviewCorrectBulk(
           [row.tx_id],
@@ -157,6 +194,8 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
   }
 
   const matchClass = matched === true ? 'match-ok' : matched === false ? 'match-fail' : ''
+  const samePhase = competing.filter((c) => c.same_phase)
+  const otherPhase = competing.filter((c) => !c.same_phase)
 
   return (
     <div className="modal-backdrop" onClick={onClose} role="presentation">
@@ -179,7 +218,14 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
         </p>
         <label>
           Phase
-          <select value={phase} onChange={(e) => setPhase(e.target.value)} aria-label="Rule phase">
+          <select
+            value={phase}
+            onChange={(e) => {
+              setPhase(e.target.value)
+              setOrderTouched(false)
+            }}
+            aria-label="Rule phase"
+          >
             <option value="override">override (category / subcategory)</option>
             <option value="property">property</option>
             <option value="category">category</option>
@@ -198,6 +244,104 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
           Subcategory
           <input value={sub} onChange={(e) => setSub(e.target.value)} aria-label="Subcategory output" />
         </label>
+
+        <div className="priority-panel">
+          <h3>Priority vs other rules</h3>
+          <p className="muted">
+            {phase === 'override'
+              ? 'Override rules all run; later order wins for Cat/Subcat.'
+              : `Within ${phase}, earlier order wins (first match).`}
+          </p>
+          <div className="priority-controls">
+            <label className="priority-order">
+              Order index
+              <input
+                type="number"
+                value={orderIndex}
+                onChange={(e) => {
+                  setOrderTouched(true)
+                  setOrderIndex(Number(e.target.value))
+                }}
+                aria-label="Order index"
+              />
+            </label>
+            <button type="button" onClick={useSuggested} disabled={testing}>
+              Use recommended ({suggestedOrder})
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOrderTouched(true)
+                setOrderIndex((n) => n + (phase === 'override' ? 1 : -1))
+              }}
+            >
+              {phase === 'override' ? 'Higher priority (+1)' : 'Higher priority (−1)'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setOrderTouched(true)
+                setOrderIndex((n) => n + (phase === 'override' ? -1 : 1))
+              }}
+            >
+              {phase === 'override' ? 'Lower priority (−1)' : 'Lower priority (+1)'}
+            </button>
+          </div>
+          {priorityNote && (
+            <p className={wouldWin ? 'match-ok' : 'match-fail'} role="status">
+              {priorityNote}
+            </p>
+          )}
+          {samePhase.length > 0 && (
+            <div className="other-matches-wrap">
+              <table className="other-matches-table">
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Rule</th>
+                    <th>Outputs</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {samePhase.map((r) => (
+                    <tr key={r.rule_id} className={r.conflict ? 'row-conflict' : ''}>
+                      <td className="num">{r.order_index}</td>
+                      <td className="memo">
+                        <code>{r.rule_id}</code>
+                        {r.learned ? ' (learned)' : ' (seed)'}
+                        <div className="muted">{r.pattern}</div>
+                      </td>
+                      <td>{outsLabel(r)}</td>
+                      <td>
+                        {r.conflict && (
+                          <button type="button" className="btn-rule" onClick={() => bumpAbove(r)}>
+                            {phase === 'override' ? 'Run after' : 'Run before'}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {otherPhase.length > 0 && (
+            <details className="other-phase-rules">
+              <summary>
+                {otherPhase.length} matching rule{otherPhase.length === 1 ? '' : 's'} in other phases
+                {conflictRuleCount ? '' : ''}
+              </summary>
+              <ul className="muted">
+                {otherPhase.slice(0, 12).map((r) => (
+                  <li key={r.rule_id}>
+                    [{r.phase} #{r.order_index}] {r.rule_id}: {outsLabel(r)}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
 
         <div className="other-matches">
           <h3>Other matching rows</h3>

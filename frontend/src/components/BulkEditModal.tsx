@@ -58,6 +58,10 @@ export default function BulkEditModal({ rows, lists, onClose, onSaved }: Props) 
   const [otherCount, setOtherCount] = useState(0)
   const [conflictCount, setConflictCount] = useState(0)
   const [testError, setTestError] = useState('')
+  const [orderIndex, setOrderIndex] = useState(-1)
+  const [priorityNote, setPriorityNote] = useState('')
+  const [wouldWin, setWouldWin] = useState(true)
+  const phase = prop && !cat && !sub ? 'property' : 'override'
 
   useEffect(() => {
     suggestPatternFromSamples(samples)
@@ -83,6 +87,7 @@ export default function BulkEditModal({ rows, lists, onClose, onSaved }: Props) 
         property_code: prop,
         category: cat,
         subcategory: sub,
+        phase,
       })
         .then((res) => {
           if (cancelled) return
@@ -93,6 +98,9 @@ export default function BulkEditModal({ rows, lists, onClose, onSaved }: Props) 
           setOthers(res.others || [])
           setOtherCount(res.other_count ?? 0)
           setConflictCount(res.conflict_count ?? 0)
+          if (res.suggested_order_index != null) setOrderIndex(res.suggested_order_index)
+          setPriorityNote(res.priority_note || '')
+          setWouldWin(res.would_win !== false)
         })
         .catch((e) => {
           if (cancelled) return
@@ -106,7 +114,7 @@ export default function BulkEditModal({ rows, lists, onClose, onSaved }: Props) 
       cancelled = true
       window.clearTimeout(t)
     }
-  }, [pattern, samples, rows, prop, cat, sub])
+  }, [pattern, samples, rows, prop, cat, sub, phase])
 
   const allSelectedMatch = selectedCount > 0 && selectedMatched === selectedCount && !testError
 
@@ -140,11 +148,12 @@ export default function BulkEditModal({ rows, lists, onClose, onSaved }: Props) 
           category: cat,
           subcategory: sub,
           pattern: pattern.trim(),
-          phase: prop && !cat && !sub ? 'property' : 'override',
+          phase,
           strength: 'strong',
+          order_index: orderIndex,
         })
         ruleIds = res.rules.map((r) => r.rule_id)
-        msg += ` and saved ${res.rules.length} rule(s)`
+        msg += ` and saved ${res.rules.length} rule(s) (order ${orderIndex})`
       }
       onSaved(msg, ruleIds.length ? { ruleIds } : undefined)
       onClose()
@@ -212,15 +221,22 @@ export default function BulkEditModal({ rows, lists, onClose, onSaved }: Props) 
           Also save as rule
         </label>
         {saveRule && (
-          <label className="queue-all-months">
-            <input
-              type="checkbox"
-              checked={applyAllMatches}
-              onChange={(e) => setApplyAllMatches(e.target.checked)}
-            />
-            Also update all matching records
-            {otherCount > 0 ? ` (${otherCount} besides the selection)` : ''}
-          </label>
+          <>
+            <label className="queue-all-months">
+              <input
+                type="checkbox"
+                checked={applyAllMatches}
+                onChange={(e) => setApplyAllMatches(e.target.checked)}
+              />
+              Also update all matching records
+              {otherCount > 0 ? ` (${otherCount} besides the selection)` : ''}
+            </label>
+            {priorityNote && (
+              <p className={wouldWin ? 'match-ok' : 'match-fail'} role="status">
+                Priority order {orderIndex}: {priorityNote}
+              </p>
+            )}
+          </>
         )}
         {otherCount > 0 && (
           <p className={conflictCount ? 'match-fail' : 'muted'}>

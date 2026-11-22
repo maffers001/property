@@ -211,6 +211,24 @@ export function getRules() {
   return api<RuleRow[]>('/rules')
 }
 
+export type MatchTextRule = RuleRow & {
+  wins_phase: boolean
+  phase_conflict: boolean
+}
+
+export function matchRulesByText(matchText: string) {
+  return api<{
+    match_text: string
+    matches: MatchTextRule[]
+    match_count: number
+    winners: Record<string, string | null>
+    note: string
+  }>('/rules/match-text', {
+    method: 'POST',
+    body: JSON.stringify({ match_text: matchText }),
+  })
+}
+
 export function createRule(body: Partial<RuleRow> & { pattern: string; phase: string }) {
   return api<RuleRow>('/rules', { method: 'POST', body: JSON.stringify(body) })
 }
@@ -233,6 +251,7 @@ export function saveRuleFromReview(body: {
   pattern?: string
   phase?: string
   strength?: string
+  order_index?: number
 }) {
   return api<{ ok: boolean; pattern: string; rules: RuleRow[] }>('/rules/from-review', {
     method: 'POST',
@@ -248,6 +267,19 @@ export function suggestRulePattern(memo: string, counterparty?: string, matchTex
   return api<{ pattern: string }>(`/rules/suggest-pattern?${sp}`)
 }
 
+export type CompetingRule = {
+  rule_id: string
+  phase: string
+  order_index: number
+  pattern: string
+  property_code: string
+  category: string
+  subcategory: string
+  learned: boolean
+  conflict: boolean
+  same_phase: boolean
+}
+
 export function testRulePattern(body: {
   pattern: string
   memo?: string
@@ -259,6 +291,8 @@ export function testRulePattern(body: {
   property_code?: string
   category?: string
   subcategory?: string
+  phase?: string
+  order_index?: number
 }) {
   return api<{
     ok: boolean
@@ -282,6 +316,12 @@ export function testRulePattern(body: {
       subcategory: string
       conflict: boolean
     }[]
+    competing_rules?: CompetingRule[]
+    competing_count?: number
+    conflict_rule_count?: number
+    suggested_order_index?: number
+    priority_note?: string
+    would_win?: boolean
   }>('/rules/test', {
     method: 'POST',
     body: JSON.stringify(body),

@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   createRule,
   deleteRule,
   getRules,
+  matchRulesByText,
   updateRule,
+  type MatchTextRule,
   type RuleRow,
 } from '../api'
 import './Rules.css'
@@ -92,6 +94,14 @@ export default function Rules() {
   const [saving, setSaving] = useState(false)
   const [sortKey, setSortKey] = useState<SortKey>('updated_at')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+  const [probeText, setProbeText] = useState('')
+  const [probeMatches, setProbeMatches] = useState<MatchTextRule[]>([])
+  const [probeNote, setProbeNote] = useState('')
+  const [probeError, setProbeError] = useState('')
+  const [probing, setProbing] = useState(false)
+  const [priorityBusy, setPriorityBusy] = useState<string | null>(null)
+  const [undo, setUndo] = useState<{ label: string; run: () => Promise<void> } | null>(null)
+  const undoTimer = useRef<number | null>(null)
 
   const load = useCallback(() => {
     getRules()
@@ -103,6 +113,102 @@ export default function Rules() {
   useEffect(() => {
     load()
   }, [load])
+
+  useEffect(() => {
+    return () => {
+      if (undoTimer.current) window.clearTimeout(undoTimer.current)
+    }
+  }, [])
+
+  const offerUndo = useCallback((label: string, run: () => Promise<void>) => {
+    if (undoTimer.current) window.clearTimeout(undoTimer.current)
+    setUndo({ label, run })
+    undoTimer.current = window.setTimeout(() => setUndo(null), 12000)
+  }, [])
+
+  const runProbe = useCallback(async (text: string) => {
+    const trimmed = text.trim()
+    if (!trimmed) {
+      setProbeMatches([])
+      setProbeNote('')
+      setProbeError('')
+      return
+    }
+    setProbing(true)
+    setProbeError('')
+    try {
+      const res = await matchRulesByText(trimmed)
+      setProbeMatches(res.matches || [])
+      setProbeNote(res.note || '')
+    } catch (e) {
+      setProbeMatches([])
+      setProbeNote('')
+      setProbeError(e instanceof Error ? e.message : 'Match probe failed')
+    } finally {
+      setProbing(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const t = window.setTimeout(() => {
+      void runProbe(probeText)
+    }, 350)
+    return () => window.clearTimeout(t)
+  }, [probeText, runProbe])
+
+  const writeOrder = async (rule: RuleRow, nextOrder: number, undoLabel: string) => {
+    const prevOrder = Number(rule.order_index)
+    if (nextOrder === prevOrder) {
+      setMessage(`${rule.rule_id} already at order ${prevOrder}`)
+      return
+    }
+    setPriorityBusy(rule.rule_id)
+    setError('')
+    setMessage('')
+    try {
+      const body = {
+        phase: rule.phase,
+        pattern: rule.pattern,
+        property_code: rule.property_code,
+        category: rule.category,
+        subcategory: rule.subcategory,
+        strength: rule.strength,
+        order_index: nextOrder,
+        enabled: rule.enabled,
+      }
+      const updated = await updateRule(rule.rule_id, body)
+      setRules((prev) => prev.map((r) => (r.rule_id === updated.rule_id ? { ...r, ...updated } : r)))
+      setMessage(`${undoLabel}: ${rule.rule_id} order ${prevOrder} → ${updated.order_index}`)
+      offerUndo(`Order change on ${rule.rule_id}`, async () => {
+        const restored = await updateRule(rule.rule_id, { ...body, order_index: prevOrder })
+        setRules((prev) => prev.map((r) => (r.rule_id === restored.rule_id ? { ...r, ...restored } : r)))
+        setMessage(`Restored ${rule.rule_id} order to ${prevOrder}`)
+        await runProbe(probeText)
+      })
+      await runProbe(probeText)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Priority update failed')
+    } finally {
+      setPriorityBusy(null)
+    }
+  }
+
+  const adjustPriority = (rule: MatchTextRule, delta: number) => {
+    void writeOrder(rule, Number(rule.order_index) + delta, delta < 0 ? 'Lowered order' : 'Raised order')
+  }
+
+  const makeWin = (rule: MatchTextRule) => {
+    const samePhase = probeMatches.filter((m) => m.phase === rule.phase && m.rule_id !== rule.rule_id)
+    let nextOrder = Number(rule.order_index)
+    if (rule.phase === 'override') {
+      const beat = Math.max(...samePhase.map((m) => Number(m.order_index)), nextOrder - 1)
+      nextOrder = beat + 1
+    } else {
+      const beat = Math.min(...samePhase.map((m) => Number(m.order_index)), nextOrder + 1)
+      nextOrder = beat - 1
+    }
+    void writeOrder(rule, nextOrder, 'Make win')
+  }
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -320,12 +426,154 @@ export default function Rules() {
       <h1>Rules</h1>
       <p className="muted">
         Matching uses Python <code>re.match</code> (case-insensitive) on the transaction match text.
-        First match in each phase wins; lower order index runs first. User-learned rules are stored in{' '}
-        <code>data/property/learned_rules.json</code> so they survive wipe and reseed. After changing rules,
-        re-run the month so existing transactions pick up new matches.
+        Property / category / subcategory: first match wins (lower order). Override: last match wins
+        (higher order). User-learned rules are in <code>data/property/learned_rules.json</code>. After
+        changing rules, re-run the month so existing transactions pick up new matches.
       </p>
-      {message && <p className="settings-message">{message}</p>}
+      {undo && (
+        <div className="undo-bar" role="status">
+          <span>{undo.label}</span>
+          <button
+            type="button"
+            onClick={() => {
+              const action = undo
+              if (undoTimer.current) window.clearTimeout(undoTimer.current)
+              setUndo(null)
+              action.run().catch((e) => setError(e instanceof Error ? e.message : 'Undo failed'))
+            }}
+          >
+            Undo
+          </button>
+        </div>
+      )}
+      {message && !undo && <p className="settings-message">{message}</p>}
       {error && <p className="error">{error}</p>}
+
+      <section className="rules-probe" aria-label="Match text probe">
+        <h2>Test match text</h2>
+        <p className="muted">
+          Paste the full transaction match text to see which enabled rules fire. Use +/− to nudge Ord by 1.
+          <strong> Make win</strong> jumps Ord so this rule beats other matches in the same phase
+          (override → higher Ord; other phases → lower Ord). Priority changes can be undone for ~12s.
+        </p>
+        <textarea
+          className="rules-probe-input"
+          value={probeText}
+          onChange={(e) => setProbeText(e.target.value)}
+          placeholder="e.g. Kye Elliott-Street Rsa Capital Limite … FASTER PAYMENT"
+          rows={3}
+          aria-label="Transaction match text"
+        />
+        <div className="rules-probe-status">
+          {probing && <span className="muted">Matching…</span>}
+          {!probing && probeError && <span className="error">{probeError}</span>}
+          {!probing && !probeError && probeText.trim() && (
+            <span className={probeMatches.some((m) => m.phase_conflict) ? 'match-fail' : 'muted'}>
+              {probeMatches.length} rule{probeMatches.length === 1 ? '' : 's'} match
+              {probeNote ? ` — ${probeNote}` : ''}
+            </span>
+          )}
+        </div>
+        {probeMatches.length > 0 && (
+          <div className="rules-probe-table-wrap">
+            <table className="rules-table rules-probe-table">
+              <thead>
+                <tr>
+                  <th>Phase</th>
+                  <th>Ord</th>
+                  <th>ID</th>
+                  <th>Pattern</th>
+                  <th>Outputs</th>
+                  <th>Result</th>
+                  <th>Priority</th>
+                </tr>
+              </thead>
+              <tbody>
+                {probeMatches.map((m) => {
+                  const outs = [m.property_code, m.category, m.subcategory].filter(Boolean).join(' / ') || '—'
+                  const busy = priorityBusy === m.rule_id
+                  return (
+                    <tr
+                      key={m.rule_id}
+                      className={[
+                        m.wins_phase ? 'probe-win' : '',
+                        m.phase_conflict ? 'probe-conflict' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                    >
+                      <td>{m.phase}</td>
+                      <td>{m.order_index}</td>
+                      <td className="rule-id">
+                        {m.rule_id}
+                        {m.learned && <span className="badge">learned</span>}
+                      </td>
+                      <td className="rule-pattern">{m.pattern}</td>
+                      <td>{outs}</td>
+                      <td>
+                        {m.wins_phase && <span className="badge badge-win">wins</span>}
+                        {m.phase_conflict && <span className="badge badge-conflict">conflict</span>}
+                        {!m.wins_phase && !m.phase_conflict && <span className="muted">—</span>}
+                      </td>
+                      <td className="rule-actions">
+                        <div className="ord-stepper" role="group" aria-label={`Order for ${m.rule_id}`}>
+                          <button
+                            type="button"
+                            className="ord-btn"
+                            disabled={busy || priorityBusy !== null}
+                            onClick={() => adjustPriority(m, -1)}
+                            title="Decrease Ord by 1 (runs earlier)"
+                            aria-label="Decrease order"
+                          >
+                            −
+                          </button>
+                          <span className="ord-value" title="Current order index">{m.order_index}</span>
+                          <button
+                            type="button"
+                            className="ord-btn"
+                            disabled={busy || priorityBusy !== null}
+                            onClick={() => adjustPriority(m, 1)}
+                            title="Increase Ord by 1 (runs later)"
+                            aria-label="Increase order"
+                          >
+                            +
+                          </button>
+                        </div>
+                        {!m.wins_phase && (
+                          <button
+                            type="button"
+                            className="btn-make-win"
+                            disabled={busy || priorityBusy !== null}
+                            onClick={() => makeWin(m)}
+                            title={
+                              m.phase === 'override'
+                                ? 'Set Ord above other overrides so this rule’s labels win'
+                                : 'Set Ord below others in this phase so this rule matches first'
+                            }
+                          >
+                            Make win
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="btn-quiet"
+                          disabled={busy}
+                          onClick={() => {
+                            setSearch(m.rule_id)
+                            startEdit(m)
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       <div className="rules-toolbar">
         <label>

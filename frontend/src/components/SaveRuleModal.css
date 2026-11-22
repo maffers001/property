@@ -68,6 +68,54 @@
   background: rgba(180, 60, 60, 0.22);
 }
 
+.priority-panel {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #333;
+}
+
+.priority-panel h3 {
+  font-size: 1rem;
+  margin: 0 0 0.4rem;
+}
+
+.priority-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-end;
+  margin: 0.5rem 0;
+}
+
+.priority-order {
+  margin: 0 !important;
+  min-width: 7rem;
+}
+
+.priority-controls button {
+  padding: 0.35rem 0.6rem;
+  background: #3d3d6b;
+  color: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.priority-controls button:hover {
+  background: #52528a;
+}
+
+.other-phase-rules {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.other-phase-rules ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.2rem;
+}
+
 .modal-card h2 {
   margin-top: 0;
 }
