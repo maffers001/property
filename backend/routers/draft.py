@@ -149,6 +149,7 @@ def _canonical_and_labels_to_rows(canonical: list[dict], labels: list[dict]) -> 
             "needs_review": 1 if lab.get("needs_review") else 0,
             "rule_strength": _get(lab, "rule_strength"),
             "reviewed_at": _get(lab, "reviewed_at"),
+            "parent_tx_id": _get(c, "parent_tx_id") or "",
         })
     return rows
 

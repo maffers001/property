@@ -297,6 +297,226 @@ def review_submit(
     return {"ok": True, "applied": len(to_submit)}
 
 
+class SplitTenancyBody(BaseModel):
+    tx_id: str
+    property_code: str
+    rent_amount: float
+    fee_amount: float | None = None  # positive fees charged; stored as negative expense
+    rent_memo: str = ""
+    fee_memo: str = "Fox & Sons"
+
+
+class UnsplitTenancyBody(BaseModel):
+    tx_id: str  # original (parent) tx_id
+
+
+def _money(x: float) -> float:
+    return round(float(x), 2)
+
+
+@router.post("/review/split-tenancy")
+def review_split_tenancy(body: SplitTenancyBody, user: dict = Depends(get_current_user)):
+    """Replace a net agent payment with OurRent + PropertyExpense split rows.
+
+    Original row is superseded (hidden). Children sum to the original amount.
+    Reminder: update data/property/bank-download/all_tenancies.xls for the new tenancy.
+    Re-running the month clears splits until you finalize.
+    """
+    tx_id = (body.tx_id or "").strip()
+    property_code = (body.property_code or "").strip()
+    if not tx_id:
+        raise HTTPException(status_code=400, detail="tx_id required")
+    if not property_code:
+        raise HTTPException(status_code=400, detail="property_code required")
+
+    rent = _money(body.rent_amount)
+    if rent <= 0:
+        raise HTTPException(status_code=400, detail="rent_amount must be positive (gross rent)")
+
+    with get_db(DB_PATH) as conn:
+        raw = conn.execute(
+            "SELECT * FROM transactions_canonical WHERE tx_id = ?", (tx_id,)
+        ).fetchone()
+        if not raw:
+            raise HTTPException(status_code=404, detail="Transaction not found")
+        parent = dict(raw)
+        if int(parent.get("is_superseded") or 0) == 1:
+            raise HTTPException(status_code=400, detail="Transaction is already superseded")
+        if parent.get("parent_tx_id"):
+            raise HTTPException(status_code=400, detail="Cannot split a row that is already a split child")
+
+        existing = conn.execute(
+            "SELECT tx_id FROM transactions_canonical WHERE parent_tx_id = ? LIMIT 1",
+            (tx_id,),
+        ).fetchone()
+        if existing:
+            raise HTTPException(
+                status_code=400,
+                detail="This transaction already has split children; unsplit first",
+            )
+
+        net = _money(parent.get("amount") or 0)
+        if body.fee_amount is None:
+            fee_out = _money(rent - net)  # positive fees charged
+        else:
+            fee_out = _money(body.fee_amount)
+        if fee_out < 0:
+            raise HTTPException(status_code=400, detail="fee_amount must be >= 0 (fees charged)")
+
+        fee_signed = _money(-fee_out)
+        if abs(_money(rent + fee_signed) - net) > 0.011:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    f"Rent ({rent}) + fee ({fee_signed}) must equal net bank amount ({net})"
+                ),
+            )
+
+        rent_id = f"{tx_id}_split_1"
+        fee_id = f"{tx_id}_split_2"
+        rent_memo = (body.rent_memo or "").strip() or (
+            f"Rent received ({property_code})"
+        )
+        fee_memo = (body.fee_memo or "").strip() or "Fox & Sons"
+
+        def _child(child_id: str, amount: float, memo: str) -> dict:
+            return {
+                "tx_id": child_id,
+                "raw_row_id": None,
+                "import_batch_id": parent["import_batch_id"],
+                "source_bank": parent.get("source_bank") or "",
+                "source_account": parent.get("source_account") or "",
+                "posted_date": parent.get("posted_date") or "",
+                "amount": amount,
+                "currency": parent.get("currency") or "GBP",
+                "counterparty": parent.get("counterparty"),
+                "reference": parent.get("reference"),
+                "memo": memo,
+                "type": parent.get("type"),
+                "balance": parent.get("balance"),
+                "bank_txn_number": parent.get("bank_txn_number"),
+                "bank_category": parent.get("bank_category"),
+                "bank_subcategory": parent.get("bank_subcategory"),
+                "effective_subcategory": parent.get("effective_subcategory"),
+                "match_text": memo,
+                "description": parent.get("description"),
+                "parent_tx_id": tx_id,
+                "is_superseded": 0,
+            }
+
+        cols = [
+            "tx_id", "raw_row_id", "import_batch_id", "source_bank",
+            "source_account", "posted_date", "amount", "currency",
+            "counterparty", "reference", "memo", "type", "balance",
+            "bank_txn_number", "bank_category", "bank_subcategory",
+            "effective_subcategory", "match_text", "description",
+            "parent_tx_id", "is_superseded",
+        ]
+        for child in (_child(rent_id, rent, rent_memo), _child(fee_id, fee_signed, fee_memo)):
+            conn.execute(
+                f"INSERT INTO transactions_canonical ({', '.join(cols)}) "
+                f"VALUES ({', '.join('?' * len(cols))})",
+                tuple(child.get(c) for c in cols),
+            )
+
+        conn.execute(
+            "UPDATE transactions_canonical SET is_superseded = 1 WHERE tx_id = ?",
+            (tx_id,),
+        )
+
+        _insert_label(
+            conn, rent_id, property_code, "OurRent", "",
+            needs_review=1, reviewed=0,
+        )
+        _insert_label(
+            conn, fee_id, property_code, "PropertyExpense", "",
+            needs_review=1, reviewed=0,
+        )
+
+        # Drop original from review queue visually (still in DB as superseded).
+        prev = _get_latest_label(conn, tx_id)
+        if prev:
+            _insert_label(
+                conn, tx_id,
+                prev.get("property_code") or "",
+                prev.get("category") or "",
+                prev.get("subcategory") or "",
+                needs_review=0,
+                reviewed=1,
+            )
+
+    return {
+        "ok": True,
+        "parent_tx_id": tx_id,
+        "rent_tx_id": rent_id,
+        "fee_tx_id": fee_id,
+        "rent_amount": rent,
+        "fee_amount": fee_signed,
+        "net_amount": net,
+        "property_code": property_code,
+        "reminder": (
+            "Update data/property/bank-download/all_tenancies.xls "
+            "(add new tenant; set previous tenant end date). "
+            "Re-running the month will clear this split until you finalize."
+        ),
+    }
+
+
+@router.post("/review/unsplit-tenancy")
+def review_unsplit_tenancy(body: UnsplitTenancyBody, user: dict = Depends(get_current_user)):
+    """Undo a tenancy split: delete child rows and restore the original."""
+    tx_id = (body.tx_id or "").strip()
+    if not tx_id:
+        raise HTTPException(status_code=400, detail="tx_id required")
+
+    with get_db(DB_PATH) as conn:
+        parent = conn.execute(
+            "SELECT * FROM transactions_canonical WHERE tx_id = ?", (tx_id,)
+        ).fetchone()
+        if not parent:
+            raise HTTPException(status_code=404, detail="Parent transaction not found")
+        parent = dict(parent)
+
+        children = [
+            dict(r)
+            for r in conn.execute(
+                "SELECT tx_id FROM transactions_canonical WHERE parent_tx_id = ?",
+                (tx_id,),
+            ).fetchall()
+        ]
+        if not children:
+            raise HTTPException(status_code=400, detail="No split children found for this transaction")
+
+        child_ids = [c["tx_id"] for c in children]
+        placeholders = ",".join("?" * len(child_ids))
+        conn.execute(
+            f"DELETE FROM transactions_labels WHERE tx_id IN ({placeholders})",
+            child_ids,
+        )
+        conn.execute(
+            f"DELETE FROM transactions_canonical WHERE tx_id IN ({placeholders})",
+            child_ids,
+        )
+        conn.execute(
+            "UPDATE transactions_canonical SET is_superseded = 0 WHERE tx_id = ?",
+            (tx_id,),
+        )
+        prev = _get_latest_label(conn, tx_id)
+        if prev:
+            _insert_label(
+                conn, tx_id,
+                prev.get("property_code") or "",
+                prev.get("category") or "",
+                prev.get("subcategory") or "",
+                needs_review=1,
+                reviewed=0,
+            )
+        else:
+            _insert_label(conn, tx_id, "", "", "", needs_review=1, reviewed=0)
+
+    return {"ok": True, "parent_tx_id": tx_id, "removed": child_ids}
+
+
 @router.post("/finalize")
 def finalize_month(
     month: str = Query(..., description="e.g. OCT2025"),

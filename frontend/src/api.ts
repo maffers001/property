@@ -190,6 +190,37 @@ export function reviewAddByRule(month: string, opts: { category?: string; proper
   })
 }
 
+export function reviewSplitTenancy(body: {
+  tx_id: string
+  property_code: string
+  rent_amount: number
+  fee_amount?: number
+  rent_memo?: string
+  fee_memo?: string
+}) {
+  return api<{
+    ok: boolean
+    parent_tx_id: string
+    rent_tx_id: string
+    fee_tx_id: string
+    rent_amount: number
+    fee_amount: number
+    net_amount: number
+    property_code: string
+    reminder: string
+  }>('/review/split-tenancy', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+}
+
+export function reviewUnsplitTenancy(txId: string) {
+  return api<{ ok: boolean; parent_tx_id: string; removed: string[] }>('/review/unsplit-tenancy', {
+    method: 'POST',
+    body: JSON.stringify({ tx_id: txId }),
+  })
+}
+
 export interface RuleRow {
   rule_id: string
   order_index: number

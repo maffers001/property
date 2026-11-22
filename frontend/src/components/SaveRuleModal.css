@@ -136,6 +136,29 @@
   border: 1px solid #444;
 }
 
+.memo-format-row {
+  margin: -0.25rem 0 0.5rem;
+}
+
+.memo-format-row .btn-quiet {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8rem;
+  background: #2a2a40;
+  color: #ddd;
+  border: 1px solid #4a4a6a;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.memo-format-row .btn-quiet:hover:not(:disabled) {
+  background: #3a3a58;
+}
+
+.memo-format-row .btn-quiet:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;

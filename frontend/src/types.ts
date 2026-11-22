@@ -19,6 +19,7 @@ export interface DraftRow {
   needs_review: number
   rule_strength?: string
   reviewed_at?: string
+  parent_tx_id?: string
 }
 
 export const DRAFT_COLUMN_KEYS = [

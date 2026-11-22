@@ -102,6 +102,39 @@
   white-space: nowrap;
 }
 
+.col-split {
+  width: 7.5rem;
+  white-space: nowrap;
+}
+
+.btn-split {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.8rem;
+  background: #3d5a4a;
+  color: #e8ffe8;
+  border: 1px solid #4a7a5a;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-split:hover {
+  background: #4a6e58;
+}
+
+.split-badge {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  font-size: 0.72rem;
+  background: #3d5a3d;
+  border-radius: 3px;
+  color: #cfe8cf;
+}
+
+.draft-table tbody tr.split-child {
+  background: rgba(60, 90, 50, 0.18);
+}
+
 .draft-footer {
   display: flex;
   flex-wrap: wrap;

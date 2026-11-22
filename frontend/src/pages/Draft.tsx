@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
-import { getDraft, getLists, reviewAdd, reviewRemove, reviewCorrect, reviewComplete, reviewSubmit, reviewAddByRule, deleteRule } from '../api'
+import { getDraft, getLists, reviewAdd, reviewRemove, reviewCorrect, reviewComplete, reviewSubmit, reviewAddByRule, deleteRule, reviewUnsplitTenancy } from '../api'
 import type { DraftRow, DraftColumnKey, DraftFilters } from '../types'
 import { DRAFT_COLUMN_KEYS } from '../types'
 import Filters, { DEFAULT_FILTERS } from '../components/Filters'
@@ -8,6 +8,7 @@ import ColumnPicker from '../components/ColumnPicker'
 import DraftTable from '../components/DraftTable'
 import SaveRuleModal from '../components/SaveRuleModal'
 import BulkEditModal from '../components/BulkEditModal'
+import SplitTenancyModal from '../components/SplitTenancyModal'
 import './Draft.css'
 
 const COLUMNS_STORAGE_KEY = 'draftColumns'
@@ -87,6 +88,7 @@ export default function Draft() {
   const [showColumnPicker, setShowColumnPicker] = useState(false)
   const [filtersCollapsed, setFiltersCollapsed] = useState(true)
   const [ruleRow, setRuleRow] = useState<DraftRow | null>(null)
+  const [splitRow, setSplitRow] = useState<DraftRow | null>(null)
   const [ruleMessage, setRuleMessage] = useState('')
   const [needsReviewOnly, setNeedsReviewOnly] = useState(true)
   const [bulkOpen, setBulkOpen] = useState(false)
@@ -329,6 +331,7 @@ export default function Draft() {
             .catch((e) => setError(e instanceof Error ? e.message : 'Failed'))
         }}
         onSaveRule={setRuleRow}
+        onSplitTenancy={setSplitRow}
         lists={lists}
       />
 
@@ -370,6 +373,24 @@ export default function Draft() {
                 setRuleMessage('Rule save undone')
               })
             }
+          }}
+        />
+      )}
+      {splitRow && (
+        <SplitTenancyModal
+          row={splitRow}
+          lists={lists}
+          onClose={() => setSplitRow(null)}
+          onSaved={(msg, meta) => {
+            setSplitRow(null)
+            setRuleMessage(`${msg}. ${meta.reminder}`)
+            setNeedsReviewOnly(true)
+            fetchDraft()
+            offerUndo('New tenancy', async () => {
+              await reviewUnsplitTenancy(meta.parentTxId)
+              setRuleMessage('New tenancy undone')
+              fetchDraft()
+            })
           }}
         />
       )}

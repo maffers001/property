@@ -10,10 +10,11 @@ type Props = {
   onCorrect: (row: DraftRow, updates: { property_code: string; category: string; subcategory: string }) => void
   onComplete?: (row: DraftRow) => void
   onSaveRule?: (row: DraftRow) => void
+  onSplitTenancy?: (row: DraftRow) => void
   lists: { property_codes: string[]; categories: string[]; subcategories: string[] } | null
 }
 
-export default function DraftTable({ rows, visibleColumns, selectedTxIds, heldTxIds, onSelect, onCorrect, onComplete, onSaveRule, lists }: Props) {
+export default function DraftTable({ rows, visibleColumns, selectedTxIds, heldTxIds, onSelect, onCorrect, onComplete, onSaveRule, onSplitTenancy, lists }: Props) {
   const toggleSelect = (txId: string) => {
     const next = new Set(selectedTxIds)
     if (next.has(txId)) next.delete(txId)
@@ -120,6 +121,7 @@ export default function DraftTable({ rows, visibleColumns, selectedTxIds, heldTx
               ))}
               {onComplete && <th className="col-done"></th>}
               {onSaveRule && <th className="col-rule"></th>}
+              {onSplitTenancy && <th className="col-split"></th>}
             </tr>
           </thead>
           <tbody>
@@ -129,6 +131,7 @@ export default function DraftTable({ rows, visibleColumns, selectedTxIds, heldTx
                 className={[
                   heldTxIds?.has(row.tx_id) ? 'filter-held' : '',
                   row.needs_review ? 'in-review' : '',
+                  row.parent_tx_id ? 'split-child' : '',
                   (row.confidence != null && row.confidence < 0.85) || row.rule_strength === 'catch_all' ? 'best-guess' : '',
                   ['OurRent', 'Mortgage', 'PropertyExpense', 'BealsRent'].includes(row.Cat || row.category || '') && !(row.Property || row.property_code || '').trim() ? 'unusual' : '',
                 ].filter(Boolean).join(' ')}
@@ -169,6 +172,22 @@ export default function DraftTable({ rows, visibleColumns, selectedTxIds, heldTx
                     >
                       Save as rule
                     </button>
+                  </td>
+                )}
+                {onSplitTenancy && (
+                  <td className="col-split">
+                    {!row.parent_tx_id ? (
+                      <button
+                        type="button"
+                        className="btn-split"
+                        onClick={(e) => { e.stopPropagation(); onSplitTenancy(row) }}
+                        title="New tenancy: split net agent payment into gross rent + letting fees"
+                      >
+                        New tenancy
+                      </button>
+                    ) : (
+                      <span className="split-badge" title={`Split from ${row.parent_tx_id}`}>split</span>
+                    )}
                   </td>
                 )}
               </tr>
