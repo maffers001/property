@@ -29,10 +29,19 @@ function saveVisibleColumns(cols: DraftColumnKey[]) {
   localStorage.setItem(COLUMNS_STORAGE_KEY, JSON.stringify(cols))
 }
 
+function amountSearchText(amount: number | null | undefined) {
+  if (amount == null || Number.isNaN(Number(amount))) return ''
+  const n = Number(amount)
+  const fixed = n.toFixed(2)
+  const abs = Math.abs(n)
+  return [String(n), fixed, String(abs), abs.toFixed(2)].join(' ')
+}
+
 function rowSearchText(r: DraftRow) {
   return [
     r.Memo, r.match_text, r.counterparty, r.Description,
     r.Account, r.Date, r.Cat, r.Subcat, r.Property, r.property_code,
+    amountSearchText(r.Amount),
   ].map((x) => String(x ?? '')).join(' ').toLowerCase()
 }
 
@@ -252,6 +261,19 @@ export default function Draft() {
           onToggleCollapsed={() => setFiltersCollapsed((c) => !c)}
         />
         <button type="button" onClick={() => setShowColumnPicker(true)}>Columns</button>
+        <button
+          type="button"
+          onClick={() => {
+            setPinnedTxIds(new Set())
+            setSelectedTxIds(new Set())
+            setError('')
+            setLoading(true)
+            fetchDraft()
+          }}
+          title="Reload from server and drop held/reviewed rows from this view"
+        >
+          Refresh
+        </button>
       </div>
 
       <div className="draft-bulk">
@@ -365,12 +387,15 @@ export default function Draft() {
           onClose={() => setRuleRow(null)}
           onSaved={(msg, meta) => {
             setRuleMessage(msg)
+            setRuleRow(null)
+            fetchDraft()
             if (meta?.ruleIds?.length) {
               offerUndo('Saved as rule', async () => {
                 for (const id of meta.ruleIds) {
                   await deleteRule(id)
                 }
                 setRuleMessage('Rule save undone')
+                fetchDraft()
               })
             }
           }}

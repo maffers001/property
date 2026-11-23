@@ -55,13 +55,30 @@ def _apply_filters(rows: list[dict], properties: list[str], categories: list[str
         rows = [r for r in rows if r.get("needs_review") == 1]
     if search and search.strip():
         q = search.strip().lower()
+
+        def _amount_blob(r: dict) -> str:
+            raw = r.get("Amount")
+            if raw is None:
+                raw = r.get("amount")
+            try:
+                n = float(raw)
+            except (TypeError, ValueError):
+                return str(raw or "")
+            abs_n = abs(n)
+            return f"{n} {n:.2f} {abs_n} {abs_n:.2f}"
+
         def hit(r):
             blob = " ".join(
-                str(r.get(k) or "")
-                for k in (
-                    "Memo", "memo", "match_text", "counterparty", "Description",
-                    "Account", "Date", "Cat", "Subcat", "Property", "property_code",
-                )
+                [
+                    *(
+                        str(r.get(k) or "")
+                        for k in (
+                            "Memo", "memo", "match_text", "counterparty", "Description",
+                            "Account", "Date", "Cat", "Subcat", "Property", "property_code",
+                        )
+                    ),
+                    _amount_blob(r),
+                ]
             ).lower()
             return q in blob
         rows = [r for r in rows if hit(r)]

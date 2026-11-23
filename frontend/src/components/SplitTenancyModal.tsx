@@ -94,15 +94,28 @@ export default function SplitTenancyModal({ row, lists, onClose, onSaved }: Prop
       ? Number(feeAmount)
       : feeAuto
 
+  const feeNeeded = Number.isFinite(rent) && rentAmount.trim() !== ''
+    ? Math.round((rent - net) * 100) / 100
+    : NaN
+
   const previewOk = useMemo(() => {
     if (!Number.isFinite(rent) || rent <= 0) return false
     if (!Number.isFinite(fee) || fee < 0) return false
     return Math.abs(rent - fee - net) < 0.015
   }, [rent, fee, net])
 
+  const canSubmit = Boolean(property.trim()) && Number.isFinite(rent) && rent > 0 && !saving
+
   const handleRentChange = (v: string) => {
     setRentAmount(v)
     if (!feeTouched) setFeeAmount('')
+  }
+
+  const applyBalancingFees = () => {
+    if (!Number.isFinite(feeNeeded) || feeNeeded < 0) return
+    setFeeTouched(true)
+    setFeeAmount(String(feeNeeded))
+    setError('')
   }
 
   const handleSave = async () => {
@@ -246,17 +259,24 @@ export default function SplitTenancyModal({ row, lists, onClose, onSaved }: Prop
 
         <p className={previewOk ? 'match-ok' : 'match-fail'} role="status">
           {Number.isFinite(rent) && Number.isFinite(fee)
-            ? `Preview: OurRent +£${money(rent)} · PropertyExpense −£${money(fee)} · net £${money(rent - fee)}`
+            ? `Preview: OurRent +£${money(rent)} · PropertyExpense −£${money(fee)} · implied bank net £${money(rent - fee)}`
             : 'Enter gross rent to preview the split'}
           {Number.isFinite(rent) && Number.isFinite(fee) && !previewOk
-            ? ` (must equal £${money(net)})`
+            ? ` — must equal bank net £${money(net)} (fees should be £${money(Math.max(0, feeNeeded))})`
             : ''}
         </p>
+        {!previewOk && Number.isFinite(feeNeeded) && feeNeeded >= 0 && Number.isFinite(rent) && rent > 0 && (
+          <div className="memo-format-row">
+            <button type="button" className="btn-quiet" onClick={applyBalancingFees}>
+              Set fees to £{money(feeNeeded)}
+            </button>
+          </div>
+        )}
 
         {error && <p className="error">{error}</p>}
         <div className="modal-actions">
           <button type="button" onClick={onClose}>Cancel</button>
-          <button type="button" className="btn-primary" onClick={handleSave} disabled={saving || !previewOk}>
+          <button type="button" className="btn-primary" onClick={handleSave} disabled={!canSubmit}>
             {saving ? 'Saving…' : 'Create rows'}
           </button>
         </div>

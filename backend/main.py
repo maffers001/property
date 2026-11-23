@@ -14,6 +14,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from backend.auth import verify_password, create_access_token, get_current_user
+from backend.debug_logging import RequestTimingMiddleware, configure_logging
+
+configure_logging()
 
 
 class LoginBody(BaseModel):
@@ -30,6 +33,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# After CORS so timing wraps the real handler work.
+app.add_middleware(RequestTimingMiddleware)
 
 
 # ----- Auth -----

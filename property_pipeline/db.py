@@ -1,10 +1,19 @@
 """SQLite database schema and connection management."""
 
+import logging
+import os
 import sqlite3
+import time
 from pathlib import Path
 from contextlib import contextmanager
 
 from .config import DB_PATH
+
+LOG = logging.getLogger("property_pipeline.db")
+
+# Fail locked waits instead of hanging forever (seconds). Override with SQLITE_TIMEOUT.
+SQLITE_TIMEOUT = float(os.environ.get("SQLITE_TIMEOUT", "15"))
+SQLITE_SLOW_MS = float(os.environ.get("SQLITE_SLOW_MS", "200"))
 
 SCHEMA_SQL = """
 PRAGMA journal_mode=WAL;
@@ -129,27 +138,57 @@ CREATE INDEX IF NOT EXISTS idx_rules_phase ON rules(phase, order_index);
 
 
 def get_connection(db_path: Path | str | None = None) -> sqlite3.Connection:
-    """Open a SQLite connection with WAL mode enabled."""
+    """Open a SQLite connection with WAL mode and a busy timeout."""
     path = str(db_path or DB_PATH)
-    conn = sqlite3.connect(path)
+    t0 = time.perf_counter()
+    try:
+        conn = sqlite3.connect(path, timeout=SQLITE_TIMEOUT)
+    except sqlite3.OperationalError as e:
+        LOG.error("sqlite connect FAILED path=%s timeout_s=%.0f err=%s", path, SQLITE_TIMEOUT, e)
+        raise
     conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute(f"PRAGMA busy_timeout={int(SQLITE_TIMEOUT * 1000)}")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.row_factory = sqlite3.Row
+    open_ms = (time.perf_counter() - t0) * 1000
+    if open_ms >= SQLITE_SLOW_MS:
+        LOG.warning("sqlite connect SLOW path=%s open_ms=%.0f", path, open_ms)
+    else:
+        LOG.debug("sqlite connect path=%s open_ms=%.0f", path, open_ms)
     return conn
 
 
 @contextmanager
 def get_db(db_path: Path | str | None = None):
     """Context manager yielding a database connection."""
+    t0 = time.perf_counter()
     conn = get_connection(db_path)
     try:
         yield conn
+        t_commit = time.perf_counter()
         conn.commit()
+        commit_ms = (time.perf_counter() - t_commit) * 1000
+        if commit_ms >= SQLITE_SLOW_MS:
+            LOG.warning("sqlite commit SLOW path=%s commit_ms=%.0f", db_path or DB_PATH, commit_ms)
+    except sqlite3.OperationalError as e:
+        elapsed_ms = (time.perf_counter() - t0) * 1000
+        LOG.error(
+            "sqlite OperationalError path=%s elapsed_ms=%.0f err=%s "
+            "(often database is locked — another process writing labels.db)",
+            db_path or DB_PATH,
+            elapsed_ms,
+            e,
+        )
+        conn.rollback()
+        raise
     except Exception:
         conn.rollback()
         raise
     finally:
         conn.close()
+        total_ms = (time.perf_counter() - t0) * 1000
+        if total_ms >= SQLITE_SLOW_MS:
+            LOG.warning("sqlite session SLOW path=%s total_ms=%.0f", db_path or DB_PATH, total_ms)
 
 
 def init_db(db_path: Path | str | None = None) -> None:

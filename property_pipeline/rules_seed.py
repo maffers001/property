@@ -499,12 +499,19 @@ def get_all_rules():
     )
 
 
+# Always include these even when no rule outputs them yet (Review App / Excel dropdowns).
+EXTRA_CATEGORIES = {
+    "Salary",
+    "BusinessSale",
+}
+
+
 def get_categories_and_subcategories():
     """Return (sorted list of category names, sorted list of subcategory names) from all rules.
 
     Used to populate Excel validation dropdowns; users can add new values in the Lists sheet.
     """
-    categories = set()
+    categories = set(EXTRA_CATEGORIES)
     subcategories = set()
     for r in get_all_rules():
         try:
@@ -524,5 +531,22 @@ def get_categories_and_subcategories():
             if out.get("subcategory"):
                 subcategories.add(out["subcategory"])
     except (OSError, json.JSONDecodeError, TypeError):
+        pass
+    try:
+        from .config import DB_PATH
+        from .db import get_db
+        if DB_PATH.exists():
+            with get_db(DB_PATH) as conn:
+                for row in conn.execute(
+                    "SELECT list_type, value FROM custom_list_entries"
+                ):
+                    t, v = row["list_type"], (row["value"] or "").strip()
+                    if not v:
+                        continue
+                    if t == "category":
+                        categories.add(v)
+                    elif t == "subcategory":
+                        subcategories.add(v)
+    except (OSError, Exception):
         pass
     return (sorted(categories), sorted(subcategories))

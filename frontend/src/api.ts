@@ -1,4 +1,5 @@
 const API_BASE = '/api'
+const DEFAULT_TIMEOUT_MS = 20_000
 
 function getToken(): string | null {
   return localStorage.getItem('token')
@@ -16,7 +17,35 @@ export async function api<T>(
   if (token) {
     (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`
   }
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers, credentials: 'include' })
+
+  const timeoutMs = DEFAULT_TIMEOUT_MS
+  const controller = new AbortController()
+  const external = options.signal
+  const onExternalAbort = () => controller.abort()
+  if (external) {
+    if (external.aborted) controller.abort()
+    else external.addEventListener('abort', onExternalAbort, { once: true })
+  }
+  const timer = window.setTimeout(() => controller.abort(), timeoutMs)
+
+  let res: Response
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers,
+      credentials: 'include',
+      signal: controller.signal,
+    })
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'AbortError') {
+      throw new Error(`Request timed out after ${timeoutMs / 1000}s — try Refresh (API may have dropped the connection)`)
+    }
+    throw e
+  } finally {
+    window.clearTimeout(timer)
+    if (external) external.removeEventListener('abort', onExternalAbort)
+  }
+
   if (res.status === 401) {
     localStorage.removeItem('token')
     window.location.href = '/'

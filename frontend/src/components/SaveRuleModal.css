@@ -102,6 +102,34 @@
   font-size: 0.85rem;
 }
 
+.competing-actions {
+  white-space: nowrap;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.btn-rule-danger {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.8rem;
+  background: #5a2a2a;
+  color: #ffe8e8;
+  border: 1px solid #7a4a4a;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-rule-danger:hover:not(:disabled) {
+  background: #6e3a3a;
+}
+
+.btn-rule-danger:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .priority-controls button:hover {
   background: #52528a;
 }

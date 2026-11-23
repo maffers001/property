@@ -32,13 +32,13 @@ export default function Filters({ filters, onChange, lists, collapsed, onToggleC
       {(!onToggleCollapsed || !collapsed) && (
         <div className="filters-inner">
           <div className="filter-group">
-            <label>Search (memo)</label>
+            <label>Search (memo / amount)</label>
             <input
               type="text"
               value={filters.search}
               onChange={(e) => update('search', e.target.value)}
-              placeholder="Search…"
-              aria-label="Search memo"
+              placeholder="Memo, amount…"
+              aria-label="Search memo or amount"
             />
           </div>
           <div className="filter-group">

@@ -88,7 +88,9 @@ Per month, four files are expected in `data/property/bank-download/`:
 - **Funds6045** – transfer from 4040 → 6045.
 - **Hilltop** – transfer to in-laws for utility bills.
 - **Interbank** – money into 3072 (mortgages) or 4040 (household) from Starling. **MortgageRefund** – corresponding outflow from Starling.
-- **MTPayment** – salary (Lloyds 1585) transferred into 6045/4040.
+- **MTPayment** – director drawings / transfers from Matthew into 6045/4040 (historical naming).
+- **Salary** – salary income (e.g. employer payroll into personal accounts).
+- **BusinessSale** – income from selling business-related items/assets (not rent).
 
 ### Property code rules
 

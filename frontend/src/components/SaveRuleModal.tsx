@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react'
-import { saveRuleFromReview, suggestRulePattern, testRulePattern, reviewCorrectBulk } from '../api'
+import {
+  saveRuleFromReview,
+  suggestRulePattern,
+  testRulePattern,
+  reviewCorrectBulk,
+  deleteRule,
+} from '../api'
 import type { CompetingRule } from '../api'
 import type { DraftRow } from '../types'
 import './SaveRuleModal.css'
@@ -59,6 +65,8 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
   const [suggestedOrder, setSuggestedOrder] = useState(-1)
   const [priorityNote, setPriorityNote] = useState('')
   const [wouldWin, setWouldWin] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [testTick, setTestTick] = useState(0)
 
   useEffect(() => {
     suggestRulePattern(row.Memo || '', row.counterparty, row.match_text)
@@ -128,7 +136,7 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
       cancelled = true
       window.clearTimeout(t)
     }
-  }, [pattern, row, prop, cat, sub, phase, orderIndex, orderTouched])
+  }, [pattern, row, prop, cat, sub, phase, orderIndex, orderTouched, testTick])
 
   const bumpAbove = (r: CompetingRule) => {
     setOrderTouched(true)
@@ -139,6 +147,27 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
   const useSuggested = () => {
     setOrderTouched(true)
     setOrderIndex(suggestedOrder)
+  }
+
+  const removeCompeting = async (r: CompetingRule) => {
+    const action = r.learned ? 'Delete' : 'Disable'
+    const ok = window.confirm(
+      r.learned
+        ? `Delete learned rule ${r.rule_id}?`
+        : `Disable built-in rule ${r.rule_id}? It will stay in the seed list but will not match.`,
+    )
+    if (!ok) return
+    setDeletingId(r.rule_id)
+    setError('')
+    try {
+      await deleteRule(r.rule_id)
+      setCompeting((prev) => prev.filter((c) => c.rule_id !== r.rule_id))
+      setTestTick((n) => n + 1)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : `${action} failed`)
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   const handleSave = async () => {
@@ -313,12 +342,23 @@ export default function SaveRuleModal({ row, onClose, onSaved }: Props) {
                         <div className="muted">{r.pattern}</div>
                       </td>
                       <td>{outsLabel(r)}</td>
-                      <td>
+                      <td className="competing-actions">
                         {r.conflict && (
                           <button type="button" className="btn-rule" onClick={() => bumpAbove(r)}>
                             {phase === 'override' ? 'Run after' : 'Run before'}
                           </button>
                         )}
+                        <button
+                          type="button"
+                          className="btn-rule-danger"
+                          disabled={deletingId === r.rule_id || saving}
+                          onClick={() => removeCompeting(r)}
+                          title={r.learned ? 'Delete this learned rule' : 'Disable this built-in rule'}
+                        >
+                          {deletingId === r.rule_id
+                            ? (r.learned ? 'Deleting…' : 'Disabling…')
+                            : (r.learned ? 'Delete' : 'Disable')}
+                        </button>
                       </td>
                     </tr>
                   ))}
