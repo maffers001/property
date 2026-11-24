@@ -151,6 +151,11 @@ def load_tenancies(tenancy_datafile):
             "(or keep a copy on the old NAS path)."
         )
     dfT = pd.read_excel(input_file,index_col=0,header=None,sheet_name='Sheet 1',names=['PROPERTY_ID','PROPERTY_NAME','TENANCY_ID','TENANT','START_DATE','END_DATE','RENT_AMOUNT','RENT_FREQ','AGENT_NAME','FEE_AMOUNT','FEE_TYPE','VAT'])
+    # Drop accidental header/label rows (non-numeric property ids) and coerce dates
+    dfT = dfT.loc[pd.to_numeric(dfT.index, errors='coerce').notna()].copy()
+    dfT.index = pd.to_numeric(dfT.index, errors='coerce').astype(int)
+    dfT['START_DATE'] = pd.to_datetime(dfT['START_DATE'], errors='coerce')
+    dfT['END_DATE'] = pd.to_datetime(dfT['END_DATE'], errors='coerce')
     return dfT
 
 def load_data(start, end):
@@ -185,7 +190,9 @@ def load_data(start, end):
     return dfAll
 
 def get_tenancy(dfT, property_id, start, end):
-    tenancy=dfT.loc[(dfT.index==property_id)&(dfT.START_DATE<=end)&((dfT.END_DATE.isnull())|(dfT.END_DATE>=start))].sort_values(['START_DATE'], ascending=False).head(1)
+    start_ts = pd.to_datetime(start)
+    end_ts = pd.to_datetime(end)
+    tenancy=dfT.loc[(dfT.index==property_id)&(dfT.START_DATE<=end_ts)&((dfT.END_DATE.isnull())|(dfT.END_DATE>=start_ts))].sort_values(['START_DATE'], ascending=False).head(1)
     if(not tenancy.empty):
         return Tenant(tenancy.index, tenancy.PROPERTY_NAME, tenancy.TENANT, tenancy.START_DATE, tenancy.END_DATE, tenancy.RENT_AMOUNT, tenancy.AGENT_NAME)
     return None
