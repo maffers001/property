@@ -150,7 +150,17 @@ def load_tenancies(tenancy_datafile):
             f"{tenancy_datafile} not found. Put it in {_DATA / 'bank-download'} "
             "(or keep a copy on the old NAS path)."
         )
-    dfT = pd.read_excel(input_file,index_col=0,header=None,sheet_name='Sheet 1',names=['PROPERTY_ID','PROPERTY_NAME','TENANCY_ID','TENANT','START_DATE','END_DATE','RENT_AMOUNT','RENT_FREQ','AGENT_NAME','FEE_AMOUNT','FEE_TYPE','VAT'])
+    dfT = pd.read_excel(
+        input_file,
+        index_col=0,
+        header=None,
+        sheet_name='Sheet 1',
+        names=[
+            'PROPERTY_ID', 'PROPERTY_NAME', 'TENANCY_ID', 'TENANT',
+            'START_DATE', 'END_DATE', 'RENT_AMOUNT', 'RENT_FREQ',
+            'AGENT_NAME', 'FEE_AMOUNT', 'FEE_TYPE', 'VAT', 'DISPLAY_ORDER',
+        ],
+    )
     # Drop accidental header/label rows (non-numeric property ids) and coerce dates
     dfT = dfT.loc[pd.to_numeric(dfT.index, errors='coerce').notna()].copy()
     dfT.index = pd.to_numeric(dfT.index, errors='coerce').astype(int)
@@ -269,14 +279,57 @@ def get_rent_statement(dfAll, dfT, start, end, inarrearslist, paidinadvancelist)
     dfRs.at[index,'Status']=''
     index=index+1
 
-    # Add totals
+    # Add totals (property + service charges only; Salary / PersonalExpense excluded)
     dfRs.at[index,'Property']='Totals'
     dfRs.at[index,'Tenant']=''
     dfRs.at[index,'Agent']=''
     dfRs.at[index,'Received']=dfRs['Received'].sum()
     dfRs.at[index,'Bills']=dfRs['Bills'].sum()
     dfRs.at[index,'Mortgage']=dfRs['Mortgage'].sum()
-    dfRs.at[index,'Net']=dfRs['Net'].sum()        
+    dfRs.at[index,'Net']=dfRs['Net'].sum()
+    dfRs.at[index,'Status']=''
+    totals_received = dfRs.at[index,'Received']
+    totals_bills = dfRs.at[index,'Bills']
+    totals_mortgage = dfRs.at[index,'Mortgage']
+    totals_net = dfRs.at[index,'Net']
+    index=index+1
+
+    # Salary (Cat) — shown below Totals, not included in Totals
+    salary_amt = dfAll.loc[(dfAll.Cat=='Salary'),'Amount'][start:end].sum()
+    dfRs.at[index,'Property']='Salary'
+    dfRs.at[index,'Tenant']=''
+    dfRs.at[index,'Agent']=''
+    dfRs.at[index,'Received']=0.0
+    dfRs.at[index,'Bills']=salary_amt
+    dfRs.at[index,'Mortgage']=0.0
+    dfRs.at[index,'Net']=salary_amt
+    dfRs.at[index,'Status']=''
+    index=index+1
+
+    # PersonalExpense drawings from Starling business account
+    starling_acct = '60-83-71 00558156'
+    pe_amt = dfAll.loc[
+        (dfAll.Cat=='PersonalExpense') & (dfAll.Account==starling_acct),
+        'Amount',
+    ][start:end].sum()
+    dfRs.at[index,'Property']='PersonalExpense'
+    dfRs.at[index,'Tenant']=''
+    dfRs.at[index,'Agent']=''
+    dfRs.at[index,'Received']=0.0
+    dfRs.at[index,'Bills']=pe_amt
+    dfRs.at[index,'Mortgage']=0.0
+    dfRs.at[index,'Net']=pe_amt
+    dfRs.at[index,'Status']=''
+    index=index+1
+
+    # Combined total including Salary + PersonalExpense drawings
+    dfRs.at[index,'Property']='Total (with drawings)'
+    dfRs.at[index,'Tenant']=''
+    dfRs.at[index,'Agent']=''
+    dfRs.at[index,'Received']=totals_received
+    dfRs.at[index,'Bills']=totals_bills + salary_amt + pe_amt
+    dfRs.at[index,'Mortgage']=totals_mortgage
+    dfRs.at[index,'Net']=totals_net + salary_amt + pe_amt
     dfRs.at[index,'Status']=''
 
     dfRs=dfRs.set_index('Property')
@@ -298,11 +351,34 @@ def custom_style(row):
     elif((row.Status=='Empty')|(row.Status=='Ending')):
        color = 'yellow'         
        
-    if((row.name in ['Totals'])):
+    if(row.name == 'Totals'):
         color = 'lightblue'
         fontweight = 'bold'
+    elif(row.name == 'Total (with drawings)'):
+        color = 'dimgray'
+        fontweight = 'bold'
+    elif(row.name in ['Salary', 'PersonalExpense']):
+        color = 'lightgrey'
+        fontweight = 'normal'
 
     style = ['background-color: %s;' % color + 'font-weight: %s;' % fontweight+ 'font-style: %s;' % fontstyle]*len(row.values)
+
+    # Flat/GFF/FFF units should have a mortgage: flag missing or under £250 (abs) on Mortgage cell only
+    prop_name = str(row.name) if row.name is not None else ''
+    if prop_name.startswith(('Flat', 'GFF', 'FFF')) and 'Mortgage' in row.index:
+        mtg = row['Mortgage']
+        try:
+            mtg_val = 0.0 if pd.isna(mtg) else float(mtg)
+        except (TypeError, ValueError):
+            mtg_val = 0.0
+        if abs(mtg_val) < 250:
+            i = list(row.index).index('Mortgage')
+            style[i] = (
+                'background-color: lightblue;'
+                + 'font-weight: %s;' % fontweight
+                + 'font-style: %s;' % fontstyle
+            )
+
     return style
 
 def plot_income_expenditure_per_property(dfRs):

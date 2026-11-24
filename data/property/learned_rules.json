@@ -2085,6 +2085,34 @@
       "enabled": 1,
       "created_at": "2026-11-23T16:09:29Z",
       "updated_at": "2026-11-23T16:09:29Z"
+    },
+    {
+      "rule_id": "prop_rent_F71214ALH_108",
+      "order_index": 108,
+      "phase": "property",
+      "pattern": ".*F7[ ]?12[-]?14.*|.*7[ ]?12[-]?14[ ]?ALH.*|.* 71214.*",
+      "outputs_json": "{\"property_code\": \"F71214ALH\"}",
+      "strength": "strong",
+      "apply_when_json": null,
+      "banks_json": null,
+      "accounts_json": null,
+      "enabled": 1,
+      "created_at": "2026-11-24T11:32:46Z",
+      "updated_at": "2026-11-24T11:32:46Z"
+    },
+    {
+      "rule_id": "prop_rent_F88ALH_100",
+      "order_index": 82,
+      "phase": "property",
+      "pattern": ".*F8[ ]?8.*|.*8[ ]?8[ ]?ALH.*|.*FURCZYK.*|.*Marin.*|.*Ricketts.*",
+      "outputs_json": "{\"property_code\": \"F88ALH\"}",
+      "strength": "strong",
+      "apply_when_json": null,
+      "banks_json": null,
+      "accounts_json": null,
+      "enabled": 1,
+      "created_at": "2026-11-24T11:41:18Z",
+      "updated_at": "2026-11-24T11:41:18Z"
     }
   ]
 }
