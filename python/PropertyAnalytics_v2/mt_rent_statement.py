@@ -207,6 +207,30 @@ def get_tenancy(dfT, property_id, start, end):
         return Tenant(tenancy.index, tenancy.PROPERTY_NAME, tenancy.TENANT, tenancy.START_DATE, tenancy.END_DATE, tenancy.RENT_AMOUNT, tenancy.AGENT_NAME)
     return None
 
+def get_previous_tenancy(dfT, property_id, start):
+    """Most recent tenancy that had ended before the statement period start."""
+    start_ts = pd.to_datetime(start)
+    prev = (
+        dfT.loc[
+            (dfT.index == property_id)
+            & dfT.END_DATE.notna()
+            & (dfT.END_DATE < start_ts)
+        ]
+        .sort_values(['END_DATE', 'START_DATE'], ascending=False)
+        .head(1)
+    )
+    if prev.empty:
+        return None
+    return Tenant(
+        prev.index,
+        prev.PROPERTY_NAME,
+        prev.TENANT,
+        prev.START_DATE,
+        prev.END_DATE,
+        prev.RENT_AMOUNT,
+        prev.AGENT_NAME,
+    )
+
 def get_rent_statement(dfAll, dfT, start, end, inarrearslist, paidinadvancelist):
     excludelist = ['321 London Rd','169 Fawcett Rd','171 Fawcett Rd','163 Fratton Rd','RSA']
     
@@ -245,6 +269,10 @@ def get_rent_statement(dfAll, dfT, start, end, inarrearslist, paidinadvancelist)
             else:
                 dfRs.at[index,'Tenant']=''
                 dfRs.at[index,'Agent']=''
+                prev = get_previous_tenancy(dfT, property_id_map[prop.pid], start)
+                if prev is not None:
+                    prev_end = pd.to_datetime(str(prev.end_date.values[0]))
+                    dfRs.at[index,'Tenant'] = f"Since {prev_end.strftime('%d/%m/%Y')}"
         dfRs.at[index,'Received']=dfAll.loc[(dfAll.Property==prop.pid)&((dfAll.Cat=='BealsRent')|(dfAll.Cat=='OurRent')),'Amount'][start:end].sum()
         dfRs.at[index,'Bills']=dfAll.loc[(dfAll.Property==prop.pid)&((dfAll.Cat=='PropertyExpense')),'Amount'][start:end].sum()
         dfRs.at[index,'Mortgage']=dfAll.loc[(dfAll.Property==prop.pid)&((dfAll.Cat=='Mortgage')),'Amount'][start:end].sum()
@@ -260,9 +288,11 @@ def get_rent_statement(dfAll, dfT, start, end, inarrearslist, paidinadvancelist)
                 and tcy_start_date is not None
                 and tcy_start_date >= pd.to_datetime(start)
             )
-            if(dfRs.at[index,'Tenant'] in paidinadvancelist):
+            # Match paid-in-advance / arrears lists against the live tenant name only
+            tenant_label = dfRs.at[index,'Tenant'] if tenancy is not None else ''
+            if(tenant_label in paidinadvancelist):
                dfRs.at[index,'Status']='PaidInAdvance'
-            elif(dfRs.at[index,'Tenant'] in inarrearslist):
+            elif(tenant_label in inarrearslist):
                dfRs.at[index,'Status']='InArrears'
             elif(tenancy is None):
                dfRs.at[index,'Status']='Empty'
@@ -395,7 +425,19 @@ def custom_style(row):
 
     return style
 
+_CHART_EXCLUDE = {
+    'Service Charges',
+    'Totals',
+    'Salary',
+    'PersonalExpense',
+    'Total (with drawings)',
+}
+
+def _df_for_property_charts(dfRs):
+    return dfRs.loc[~dfRs.index.isin(_CHART_EXCLUDE)]
+
 def plot_income_expenditure_per_property(dfRs):
+    dfRs = _df_for_property_charts(dfRs)
     dfBar=pd.DataFrame()
 
     dfBar['Received'] = dfRs['Received']
@@ -413,6 +455,7 @@ def plot_income_expenditure_per_property(dfRs):
     dfBar[['Received']].plot.bar(stacked=True,ax=ax, position=2, width=.3, color=['green'],figsize=(30,15),fontsize=20).legend(loc=2, prop={'size': 20})
 
 def plot_net_income(dfRs):
+    dfRs = _df_for_property_charts(dfRs)
     dfBar=pd.DataFrame()
 
     dfBar['Net'] = dfRs['Net']
