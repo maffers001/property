@@ -219,6 +219,8 @@ def get_rent_statement(dfAll, dfT, start, end, inarrearslist, paidinadvancelist)
     for key in property_map:
         tcy_start_date=None
         tcy_end_date=None
+        tenancy=None
+        expected_rent=None
         prop=property_map[key]
         dfRs.at[index,'Property']=key
         if prop.pid != 'RSA' and prop.pid in property_id_map:
@@ -228,6 +230,12 @@ def get_rent_statement(dfAll, dfT, start, end, inarrearslist, paidinadvancelist)
                 tenant=tenancy.tcy_name.values[0]
                 agent=tenancy.agent.values[0]
                 tcy_start_date=pd.to_datetime(str(tenancy.start_date.values[0]))
+                try:
+                    expected_rent=float(tenancy.rent.values[0])
+                except (TypeError, ValueError):
+                    expected_rent=None
+                if expected_rent is not None and pd.isna(expected_rent):
+                    expected_rent=None
                 if(not pd.isnull(tenancy.end_date.values[0])):
                     tcy_end_date=pd.to_datetime(str(tenancy.end_date.values[0]))
                     dfRs.at[index,'Tenant']=tenant + ' (' + tcy_start_date.strftime('%d/%m/%Y') + '-' + tcy_end_date.strftime('%d/%m/%Y') +')'
@@ -246,25 +254,31 @@ def get_rent_statement(dfAll, dfT, start, end, inarrearslist, paidinadvancelist)
         # Calc statuses
         dfRs.at[index,'Status']=''
         if(key not in excludelist):
+            received = dfRs.at[index,'Received']
+            is_new = (
+                tenancy is not None
+                and tcy_start_date is not None
+                and tcy_start_date >= pd.to_datetime(start)
+            )
             if(dfRs.at[index,'Tenant'] in paidinadvancelist):
                dfRs.at[index,'Status']='PaidInAdvance'
             elif(dfRs.at[index,'Tenant'] in inarrearslist):
                dfRs.at[index,'Status']='InArrears'
-            elif(dfRs.at[index,'Received'] == 0):
+            elif(tenancy is None):
+               dfRs.at[index,'Status']='Empty'
+            elif(is_new and received == 0):
+               # Just moved in, no payment yet — green New, not red/pink
+               dfRs.at[index,'Status']='New'
+            elif(received == 0):
                dfRs.at[index,'Status']='NotPaid'
-            elif(dfRs.at[index,'Received'] <= 300):
-               dfRs.at[index,'Status']='Underpayment'        
+            elif(expected_rent is not None and expected_rent > 0 and received < expected_rent):
+               dfRs.at[index,'Status']='Underpayment'
             else:
                dfRs.at[index,'Status']='Paid'
 
-            if(tenancy is not None):
-                if(tcy_start_date>=pd.to_datetime(start)):
-                    dfRs.at[index,'Status']='New'
-                elif((tcy_end_date is not None)):
-                    if(tcy_end_date>=pd.to_datetime(start))&(tcy_end_date<=pd.to_datetime(end)):
-                        dfRs.at[index,'Status']='Ending'
-            else:
-                dfRs.at[index,'Status']='Empty'
+            if(tenancy is not None and not is_new and tcy_end_date is not None):
+                if(tcy_end_date>=pd.to_datetime(start))&(tcy_end_date<=pd.to_datetime(end)):
+                    dfRs.at[index,'Status']='Ending'
 
         index=index+1
 
