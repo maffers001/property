@@ -472,7 +472,70 @@ def plot_net_income(dfRs):
     ax.axhline(-800, color="gray",linestyle='--')
     ax.axhline(-1000, color="gray",linestyle='--')
 
-    ax.legend(loc=2, prop={'size': 20})    
+    ax.legend(loc=2, prop={'size': 20})
+
+# Stable colours so the same PersonalExpense Subcat looks the same across months
+_PERSONAL_EXPENSE_COLORS = {
+    'A1 Foods': '#8c564b',
+    'A1Foods': '#8c564b',
+    'ALDI': '#1f77b4',
+    'Alessio': '#ff7f0e',
+    'Amazon': '#2ca02c',
+    'Budgens': '#d62728',
+    'COOP': '#9467bd',
+    'Car': '#e377c2',
+    'Cash': '#7f7f7f',
+    'Clothing': '#bcbd22',
+    'Coffee': '#17becf',
+    'Costco': '#aec7e8',
+    'Dentist': '#ffbb78',
+    'EatingOut': '#98df8a',
+    'Garage': '#ff9896',
+    'HMRC': '#c5b0d5',
+    'Health': '#c49c94',
+    'Holiday': '#f7b6d2',
+    'Household': '#c7c7c7',
+    'Houshold': '#c7c7c7',
+    'Ivana': '#dbdb8d',
+    'LIDL': '#9edae5',
+    'Lidl': '#9edae5',
+    'M&S': '#393b79',
+    'Morrisons': '#637939',
+    'Other': '#8c6d31',
+    'Othr': '#8c6d31',
+    'Othre': '#8c6d31',
+    'Pharmacy/Opticians/Dental': '#843c39',
+    'Rocco': '#7b4173',
+    'Sainsburys': '#5254a3',
+    'Sofia': '#6b6ecf',
+    'Tesco': '#9c9ede',
+    'Waitrose': '#cedb9c',
+}
+
+def plot_personal_expense_by_subcat(dfAll, start, end, exclude_account_prefix='6045'):
+    """Pie of PersonalExpense by Subcat with stable colours across months."""
+    mask = dfAll.Cat == 'PersonalExpense'
+    if exclude_account_prefix:
+        acct_num = dfAll.Account.astype(str).str.split().str[-1].fillna('')
+        mask = mask & ~acct_num.str.startswith(exclude_account_prefix)
+    dfPe = dfAll.loc[mask, ['Subcat', 'Amount']][start:end]
+    by_sub = dfPe.groupby('Subcat')['Amount'].sum().abs().sort_values(ascending=False)
+    by_sub = by_sub[by_sub > 0]
+    pe_total = float(by_sub.sum()) if len(by_sub) else 0.0
+    print(f'Total PersonalExpense: £{pe_total:,.2f}')
+    if pe_total <= 0:
+        print('No PersonalExpense in period')
+        return None
+
+    def _pe_autopct(pct):
+        value = pct / 100.0 * pe_total
+        return f'{pct:.1f}%\n£{value:,.0f}'
+
+    colors = [_PERSONAL_EXPENSE_COLORS.get(str(k), '#bbbbbb') for k in by_sub.index]
+    ax = by_sub.plot.pie(autopct=_pe_autopct, figsize=(10, 10), colors=colors)
+    ax.set_ylabel('')
+    ax.set_title(f'PersonalExpense by Subcat (total £{pe_total:,.0f})')
+    return ax
 
 def custom_style_accounts_cat(row):
     color = 'white'
